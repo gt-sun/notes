@@ -61,7 +61,7 @@ Out[27]: 99
 
 通常情况下，上面的`set_score`方法可以直接定义在 class 中，但动态绑定允许我们在程序运行的过程中动态给 class 加上功能，这在静态语言中很难实现。
 
-**使用__slots__**<span id="jump"></span>
+**使用`__slots__`**<span id="jump"></span>
 
 但是，如果我们想要限制实例的属性怎么办？比如，只允许对 Student 实例添加name和age属性。
 
