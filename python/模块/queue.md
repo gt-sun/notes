@@ -75,7 +75,7 @@ class Consumer_even(threading.Thread):
                 else:
                     self.data.put(v)
                     time.sleep(2)
-            except:
+            except queue.Empty:
                 print("{} : {} is finshed!".format(time.ctime(), self.getName()))
                 break
 
@@ -95,7 +95,7 @@ class Consumer_odd(threading.Thread):
                 else:
                     self.data.put(v)
                     time.sleep(2)
-            except:
+            except queue.Empty:
                 print("{} : {} is finshed!".format(time.ctime(), self.getName()))
                 break
 
