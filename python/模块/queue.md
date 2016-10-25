@@ -20,9 +20,9 @@ q.get()
 调用队列对象的 get() 方法从队头删除并返回一个项目。可选参数为 block，默认为 True。如果队列为空且 block 为 True，get() 就使调用线程暂停，直至有项目可用。如果队列为空且 block 为 False，队列将引发 Empty 异常。
 
 - Python Queue 模块有三种队列及构造函数
-    1、Python Queue 模块的 FIFO 队列先进先出。     class Queue.Queue(maxsize)
-    2、LIFO 类似于堆，即先进后出。                         class Queue.LifoQueue(maxsize)
-    3、还有一种是优先级队列级别越低越先出来。    class Queue.PriorityQueue(maxsize)
+    - 1、Python Queue 模块的 FIFO 队列先进先出。     class Queue.Queue(maxsize)
+    - 2、LIFO 类似于堆，即先进后出。                         class Queue.LifoQueue(maxsize)
+    - 3、还有一种是优先级队列级别越低越先出来。    class Queue.PriorityQueue(maxsize)
 
 `q.qsize()` 返回队列的大小
 `q.empty()` 如果队列为空，返回 True, 反之 False
