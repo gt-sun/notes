@@ -632,3 +632,59 @@ if __name__ == '__main__':
       else:
         print("Got a record %s" % rec)
 ```
+
+# 协程
+
+把函数编写为一个任务，从而能处理发送给它的一系列输入。这类函数称为协程，可使用yield语句并以表达式(yield)的形式创建协程，比如：
+
+```
+In [35]: def print_matches(matchtext):
+   ....:     print("Looking for", matchtext)
+   ....:     while 1:
+   ....:         line = (yield)
+   ....:         if matchtext in line:
+   ....:             print("in it")
+   ....:
+
+In [36]: m = print_matches('python')
+
+In [39]: next(m)
+Looking for python
+
+In [40]: m.send('hahahahah world!')
+
+In [41]: m.send("python is good!")
+in it
+
+In [42]: m.send("php is bad")
+
+In [43]: m.close()
+
+In [44]: m.send("php is bad")
+---------------------------------------------------------------------------
+StopIteration                             Traceback (most recent call last)
+<ipython-input-44-e0bc07402983> in <module>()
+----> 1 m.send("php is bad")
+
+StopIteration:
+```
+
+基于生产者-使用者模式编写并发程序时，协程十分有用。在这种模型中，协程代表了数据的一个使用者。下面给出了共同使用生成器和协程的列子：
+
+```
+# 一组匹配器协程
+matchers = [
+    print_matches("python"),
+    print_matches("guido"),
+    print_matches("java")
+]
+
+#准备所有匹配器
+for m in matchers:
+    next(m)
+
+wwwlog = tail(open("access.log"))
+for line in wwwlog:
+    for m in matchers:
+        m.send(line)  # 将数据发送到每个匹配器中
+```
