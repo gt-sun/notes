@@ -1,5 +1,170 @@
 [TOC]
 
+### 函数的使用
+
+- 可以带`function fun()` 定义，也可以直接`fun()` 定义,不带任何参数。
+- 参数返回，可以加`return` 返回;如果不加，将以最后一条命令运行结果，作为返回值。 `return`后跟数值n(0-255)
+- 函数里面写`exit`，会直接退出整个脚本，后面的命令不再运行；
+- 如果需要跳出函数继续执行下面的语句块，使用`return`；
+
+```shell
+#!/bin/bash
+
+func(){
+    echo "$1"
+    return
+    echo "不会执行到这里"  # 不会执行
+}
+
+func "nc"  # 传参
+```
+
+实例：函数遍历目录中所有文件包括子目录
+
+```shell
+#!/bin/bash
+function traverse(){
+for file in `ls $1`
+      do
+         if [ -d $1"/"$file ]
+         then
+            traverse $1"/"$file
+         else
+            echo $1"/"$file 
+         fi
+      done
+   }
+ 
+traverse "/usr/local/src"
+```
+
+
+### 循环语句
+
+- 数字段形式
+
+```
+for i in {1..10}
+do
+   echo $i
+done
+```
+
+- 详细列出（字符且项数不多）
+
+```
+for File in 1 2 3 4 5
+do
+    echo $File
+done
+```
+
+- 对存在的文件进行循环
+
+```
+for shname in *.sh
+do
+    ...
+done
+```
+
+
+- 查找循环（ls数据量太大的时候也可以用这种方法）
+
+```
+for shname in `find . -type f -name "*.sh"`
+do
+    ...
+done
+```
+
+- ((语法循环--有点像C语法，但记得双括号
+
+```
+for((i=1;i<100;i++))
+do
+    ...
+done
+```
+
+- seq形式 起始从1开始
+
+```
+for i in `seq 100`
+do
+    ...
+done
+```
+
+- while循环注意为方括号[],且注意空格
+
+```
+min=1
+max=100
+while [ $min -le $max ]
+do
+    echo $min
+    min=`expr $min + 1`
+done
+```
+
+无限循环语法格式：
+
+```
+while :
+do
+    command
+done
+或者
+while true
+do
+    command
+done
+```
+
+按行读取文件：
+
+`while read line;do echo "---"$line"++";done </etc/passwd`
+
+- 双括号形式，内部结构有点像C的语法，
+
+```
+i=1
+while((i<100))
+do
+    if((i%4==0));then
+        echo $i
+    fi
+   ((i++))
+done
+```
+
+- case
+
+```
+read -p "restart which tomcat? plz enter the number: " whichone
+case "${whichone}" in
+    1)
+        echo "restart /app/tomcat..."
+                ps -ef |grep "/app/tomcat/" |egrep -v "grep|tail" |awk '{print $2}' |xargs kill -9
+                sleep 2
+                /app/tomcat/bin/startup.sh
+                echo "restart /app/tomcat okkkkk"
+                ;;
+    2)
+        echo "restart /app/tomcat_8081..."
+                ps -ef |grep "/app/tomcat_8081" |egrep -v "grep|tail" |awk '{print $2}' |xargs kill -9
+                sleep 2
+                /app/tomcat_8081/bin/startup.sh
+                echo "restart /app/tomcat_8081 okkkkk"
+                ;;
+    *)
+                echo -e "error enter!!  BYE\n"
+                exit 1
+esac
+```
+
+
 ### bash 数组
 
 **从0开始**
@@ -39,6 +204,22 @@ test_211 /dev/shm/a # echo ${#sz[@]}  # 数组长度
 3
 ```
 
+实例：打印下面这句话中字母数不大于6的单词
+
+```shell
+#!/bin/bash
+content="I am oldboy teacher welcome to oldboy training class."
+new_content=`echo $content | sed 's/\.//'`
+echo $new_content
+arg=(`echo $new_content`)
+for i in ${arg[@]}
+do
+if [[ ${#i} -le 6 ]];then
+echo $i
+fi
+done
+```
+
 
 ### 变量技巧
 
@@ -72,6 +253,28 @@ com
 
 ```
 
+### basename和dirname
+
+`basename`提取文件名：
+
+```
+var=/dir1/dir2/file.txt
+echo $(basename $var)  # file.txt
+```
+
+如果只想文件名不想要后缀：
+
+```
+var=/dir1/dir2/file.txt
+echo $(basename $var .txt)  # file
+```
+
+`dirname`提取目录名：
+
+```
+var=/dir1/dir2/file.txt
+echo $(dirname $var)  # /dir1/dir2
+```
 
 
 ### 其他有用命令
