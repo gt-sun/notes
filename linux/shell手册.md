@@ -1,5 +1,43 @@
 [TOC]
 
+### bash 数组
+
+**从0开始**
+
+以下dst_dir不是一个数组
+
+```
+# dst_dir=$(find /dev/shm/ -type f -name "${filename}" -exec dirname {} \;)                  
+
+# echo ${dst_dir}
+/dev/shm/a /dev/shm
+
+# echo ${dst_dir[@]}
+/dev/shm/a /dev/shm
+
+# echo ${#dst_dir[@]}   #打印长度
+1
+
+# echo ${#dst_dir}   #打印变量的长度
+19
+```
+
+正确创建数组的方式：
+
+```
+test_211 /dev/shm/a # ls
+1  2  3
+
+test_211 /dev/shm/a # sz=($(find `pwd` -type f))  # sz 为数组
+test_211 /dev/shm/a # echo ${sz[1]}
+/dev/shm/a/2
+test_211 /dev/shm/a # echo ${sz[0]}
+/dev/shm/a/3
+test_211 /dev/shm/a # echo ${sz[2]}
+/dev/shm/a/1
+test_211 /dev/shm/a # echo ${#sz[@]}  # 数组长度
+3
+```
 
 
 ### 变量技巧
