@@ -37,3 +37,30 @@ whire True:
 ```
 
 使用闭包的版本运行速度要快得多。
+
+另一个闭包实例：
+
+```python
+def addx(x):
+    def adder (y): return x + y
+    return adder
+
+add8 = addx(8)
+add9 = addx(9)
+
+print add8(100)
+print add9(100)
+```
+
+闭包一般和匿名函数同时使用：
+
+```python
+def addx(x):
+    return lambda y: x + y
+
+add8 = addx(8)
+add9 = addx(9)
+
+print add8(100)
+print add9(100)
+```
