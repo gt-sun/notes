@@ -22,3 +22,33 @@ a = Date(1990,10,22)
 b = Date.now()
 c = Date.tomorrow()
 ```
+
+
+## 特性 `property`
+
+是一种特殊的属性，访问它时会计算它的值。
+
+实例：
+
+```python
+import math
+
+class Circle(object):
+    def __init__(self, radius):
+        self.radius = radius
+    @property
+    def area(self):
+        return math.pi * self.radius**2
+    @property
+    def perimeter(self):
+        return 2*math.pi*self.radius
+    
+    
+c = Circle(4)
+print(c.radius)
+print(c.area)
+print(c.perimeter)
+
+```
+
+`@property`支持以简单属性的形式访问后面的方法，无需像额外的()来调用方法。
