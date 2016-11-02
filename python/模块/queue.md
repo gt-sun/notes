@@ -1,4 +1,5 @@
 Python 中，队列是线程间最常用的交换数据的形式。Queue 模块是提供队列操作的模块。
+多进程可使用`multiprocessing.Queue`
 
 - 创建一个 “队列” 对象
 
