@@ -61,6 +61,8 @@ def compare(a, b):
         pass
 ```
 
+Ps： python中没有赋值，只有引用。
+
 
 ## 动态给实例绑定属性、方法
 
