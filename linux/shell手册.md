@@ -774,30 +774,24 @@ ldavg-15：过去15分钟的系统平均负载
 ### ps
 
 参数：
--l　　进程数
+`-l`　　进程数
 
 
 列举出系统中所有不是由你运行的程序:
-> ps aux | grep -v \`whoami\`
+`ps aux | grep -v $(whoami)`
 
 或者，更巧妙些的是，为什么不列出最占用时间的前十个程序呢：
 > ps aux --sort=-%cpu | grep -m 11 -v \`whoami\`
 
 查找僵尸进程并kill:
-> ps -A -o stat,ppid,pid,cmd | grep -e '^[Zz]' | awk '{print $2}' | xargs kill -9  
+`ps -A -o stat,ppid,pid,cmd | grep -e '^[Zz]' | awk '{print $2}' | xargs kill -9`  
 
-查看pid：
->ps --pid 6619  
+查看pid：`ps --pid 6619`
 
-查看进程开始时间，运行时长：
-> ps -eo pid,lstart,etime | grep 17649
+查看进程开始时间，运行时长：`ps -eo pid,lstart,etime | grep 17649`
 
-列出该进程的所有线程：
-> pstree -p 进程号  {}表示线程
-pstree -H 进程号
 
-使用top实时查看  :
-> top -Hp 进程号
+使用top实时查看 `top -Hp 进程号`
 
 pgrep
 > look up or signal processes based on name and other attributes
@@ -805,12 +799,10 @@ pgrep
 pidof
 > find the process ID of a running program
 
-```
-查看某个进程有多少端口：
-netstat -anp |grep 32022
-```
 
--
+查看某个进程有多少端口：`netstat -anp |grep 32022`
+
+
 
 ```
 ps -e -o 'pid,comm,args,pcpu,rsz,vsz,stime,user,uid' | grep oracle |  sort -nrk5   #其中rsz为实际内存，上例实现按内存排序，由大到小
@@ -822,14 +814,25 @@ ps aux | sort -k4nr | head -n 10  #查占用内存最多的进程
 
 ```
 
+### pstree
+
+`-A` 各进程间连接用 ASCII 字符连接   
+`-U` 该进程之间连接用 utf8 字符连接   
+`-p` 同时显示 PID   
+`-u` 同时列出每个进程的所属账号名称
+
+`pstree -Aup`
+
 ### top
 
-top -c        显示完整的程序命令
+`-c`  显示完整的程序命令
 
--H   # 显示线程
-top -p 22  #只监控指定进程
-top -b -n 1    #批处理模式输出一次退出
+`-H`  显示线程
+`-p 22`  只监控指定进程
+`-b -n 1`  批处理模式输出一次退出
+
 按f键，可选显示列
+
 参数说明
 d 指定每两次屏幕信息刷新之间的时间间隔。当然用户可以使用s交互命令来改变之。
 u 只查看指定用户名的进程
@@ -842,9 +845,6 @@ S 指定累计模式
 s 使top命令在安全模式中运行。这将去除交互命令所带来的潜在危险。
 i 使top不显示任何闲置或者僵死进程。
 
-```
-top -d 300 -n 1 -b >> top.log
-```
 
 ### 用户和组
 
