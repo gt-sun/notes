@@ -1,3 +1,56 @@
+[TOC]
+
+
+# 一件事
+
+## 远程仓库回滚
+
+[链接](http://blog.mtxcxin.cn/blog/git%E5%A6%82%E4%BD%95%E5%9B%9E%E6%BB%9A%E8%BF%9C%E7%A8%8B%E4%BB%93%E5%BA%93.html)
+
+### 删除最后一次提交
+
+只需要以下两步就可以了
+
+```
+git revert HEAD
+git push origin master
+```
+
+**注意，revert 和 reset 的区别:**
+
+**revert** 是放弃指定提交的修改，但是会生成一次新的提交，需要填写提交注释，以前的历史记录都在，而 **reset** 是指将 HEAD 指针指到指定提交，历史记录中不会出现放弃的提交记录。
+
+### 删除历史某次提交
+
+这种情况需要先用 `git log` 命令在历史记录中查找到想要删除的某次提交的 `commit id`，比如下图中圈出来的就是注释为 "2" 的提交的 `commit id`
+
+然后执行以下命令（`commit id` 替换为想要删除的提交的 `commit id`，需要注意最后的 `^` 号，意思是 `commit id` 的前一次提交）：
+
+`git rebase -i "commit id"^`
+
+执行该条命令之后会打开一个编辑框，内容如下，列出了包含该次提交在内之后的所有提交。
+
+然后在编辑框中删除你想要删除的提交所在行，然后保存退出就好啦，如果有冲突的需要解决冲突。接下来，执行以下命令，将本地仓库提交到远程库就完成了：
+
+`git push origin master -f`
+
+### 修改历史某次提交
+
+这种情况的解决方法类似于第二种情况，只需要在第二条打开编辑框之后，将你想要修改的提交所在行的 pick 替换成 edit 然后保存退出，这个时候 rebase 会停在你要修改的提交，然后做你需要的修改，修改完毕之后，执行以下命令：
+
+```
+git add .
+git commit --amend
+git rebase --continue
+```
+
+如果你在之前的编辑框修改了 n 行，也就是说要对 n 次提交做修改，则需要重复执行以上步骤 n 次。
+
+需要注意的是，在执行 `rebase` 命令对指定提交修改或删除之后，该次提交之后的所有提交的 `commit id` 都会改变。
+
+
+# 命令列表
+
 ## 一、新建代码库
 
 ```
@@ -186,6 +239,9 @@ $ git log -p [file]
 # 显示过去5次提交
 $ git log -5 --pretty --oneline
 
+# 记录你的每一次命令
+$ git reflog
+
 # 显示所有提交过的用户，按提交次数排序
 $ git shortlog -sn
 
@@ -272,8 +328,10 @@ $ git reset --hard
 $ git reset [commit]
 
 # 重置当前分支的HEAD为指定commit，同时重置暂存区和工作区，与指定commit一致
-$ git reset --hard [commit]
+$ git reset --hard [commit] # 回退/前进到该版本
 $ git reset --hard HEAD^  #恢复到上一次的commit
+
+Ps: 在 Git 中，用`HEAD`表示当前版本，上一个版本就是`HEAD^`，往上 100 个版本写成`HEAD~100`。
 
 # 重置当前HEAD为指定commit，但保持暂存区和工作区不变
 $ git reset --keep [commit]
