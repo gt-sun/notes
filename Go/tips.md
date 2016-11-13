@@ -1,5 +1,41 @@
 
 
+
+
+
+## 修改字符串中的某个字符
+
+Go 语言中的字符串是不可变的，也就是说 str[index] 这样的表达式是不可以被放在等号左侧的。如果尝试运行 str[i] = 'D' 会得到错误：cannot assign to str[i]。
+
+因此，您必须先将字符串转换成字节数组，然后再通过修改数组中的元素值来达到修改字符串的目的，最后将字节数组转换回字符串格式。
+
+例如，将字符串 "hello" 转换为 "cello"：
+
+```go
+s := "hello"
+c := []byte(s)
+c[0] = ’c’
+s2 := string(c) // s2 == "cello"
+```
+
+
+## `byte` 与 `string` 转换
+
+```
+b := []byte{'a', 'b', 'c'}
+s := string(b[:])
+
+
+s := "abcd"
+b := []byte(s)
+
+//使用copy()
+s := "abcd"
+var b [4]byte
+copy(b[:], s)
+```
+
+
 ## new 和 make
 
 new 和 make 均是用于分配内存。
