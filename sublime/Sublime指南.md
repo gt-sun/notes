@@ -1,3 +1,10 @@
+
+
+## sidebar 侧边栏设置
+
+http://stackoverflow.com/questions/23045968/increase-the-font-size-of-text-in-sublime-side-bar
+
+
 ## 快捷键
 
 Alt + Shift + 2 进行左右分屏， Alt + Shift + 8 进行上下分屏
