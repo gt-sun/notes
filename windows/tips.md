@@ -1,3 +1,9 @@
+
+
+## 创建任意大小文件
+
+`fsutil file createnew 盘符:\ 文件名. 后缀名 大小（例如 2048000000，约等于 1.90G，按字节计算）`
+
 ## 添加右键快捷键
 
 找到`HKEY_CLASSES_ROOT\*\shell`，在`shell`下新建一个项目`UltraEdit`，再在新建的UltraEdit下新建`command`项目。
