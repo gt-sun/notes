@@ -1,5 +1,10 @@
 
 
+## 文章链接
+
+- Golang 的方法集继承规则示例  
+http://blog.jobbole.com/107613/
+
 
 
 
