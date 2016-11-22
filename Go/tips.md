@@ -5,6 +5,11 @@
 - Golang 的方法集继承规则示例  
 http://blog.jobbole.com/107613/
 
+- 十条有用的 GO 技术
+http://mikespook.com/2014/07/%E5%8D%81%E6%9D%A1%E6%9C%89%E7%94%A8%E7%9A%84-go-%E6%8A%80%E6%9C%AF/
+
+### 
+
 
 
 
