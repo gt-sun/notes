@@ -228,29 +228,63 @@ copy(b[:], s)
 ```
 
 ### bool 转换其他
+
 - string
+
 ```
         // 通过Sprintf方法转换  
         str2 := fmt.Sprintf("%d", b)  
         // 通过FormatInt转换
         str3 = strconv.FormatBool()
 ```
+
 - int
+
 ```
         int(i)
 ```
+
 - float 
+
 ```
         float(i)
 ```
 
 ### 单独说下byte
+
 - byte转换string
+
 ```
     string(byte)
 ```
+
 - byte转换int、bool、float
+
 使用encoding/binary包做转换
 
 - int、bool、float转换byte
+
 使用encoding/binary包做转换
+
+### interface转为string
+
+```go
+func interface2string(inter interface{}) string {
+    tempStr := ""
+    switch inter.(type) {
+    case string:
+        tempStr = inter.(string)
+        break
+    case float64:
+        tempStr = strconv.FormatFloat(inter.(float64), 'f', -1, 64)
+        break
+    case int64:
+        tempStr = strconv.FormatInt(inter.(int64), 10)
+        break
+    case int:
+        tempStr = strconv.Itoa(inter.(int))
+        break
+    }
+    return tempStr
+}
+```
