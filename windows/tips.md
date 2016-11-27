@@ -1,5 +1,10 @@
 
 
+
+## chrome标签声音
+
+chrome://flags/#enable-tab-audio-muting
+
 ## 创建任意大小文件
 
 `fsutil file createnew 盘符:\ 文件名. 后缀名 大小（例如 2048000000，约等于 1.90G，按字节计算）`
