@@ -1,5 +1,188 @@
+[TOC]
 
-## 数组去重去空
+## IO操作
+
+### 关闭文件操作
+
+如果你在一个 for 循环内部处理一系列文件，你需要使用 defer 确保文件在处理完毕后被关闭，例如：
+
+```go
+for _, file := range files {
+    if f, err = os.Open(file); err != nil {
+        return
+    }
+    // 这是错误的方式，当循环结束时文件没有关闭
+    defer f.Close()
+    // 对文件进行操作
+    f.Process(data)
+}
+```
+
+但是在循环结尾处的 defer 没有执行，所以文件一直没有关闭！垃圾回收机制可能会自动关闭文件，但是这会产生一个错误，更好的做法是：
+
+```go
+for _, file := range files {
+    if f, err = os.Open(file); err != nil {
+        return
+    }
+    // 对文件进行操作
+    f.Process(data)
+    // 关闭文件
+    f.Close()
+ }
+```
+
+defer 仅在函数返回时才会执行
+
+### `ioutil.ReadFile`读取文件
+
+```go
+
+// 一下子全部读取
+package main
+
+import (
+    "fmt"
+    "io/ioutil"
+)
+
+func main() {
+    file := "C:\\Users\\sun\\Documents\\git\\notes\\Go\\codes.md"
+    f, err := ioutil.ReadFile(file)  //ReadFile 会先判断文件的大小，给 bytes.Buffer 一个预定义容量，避免额外分配内存。
+    if err != nil {
+        panic(err)
+    }
+    fmt.Println(string(f))
+}
+```
+
+### `ioutil.WriteFile`写入文件
+
+```go
+import "io/ioutil"
+
+func main() {
+    // var data byte
+    s := "dsf打偶然"
+    data := []byte(s)
+    err := ioutil.WriteFile("sun2.log", data, 0666)
+    if err != nil {
+        panic(err)
+    }
+}
+```
+
+### 使用`os`包 新建并写入内容
+
+```go
+func main() {
+    f, err := os.Create("sun.log") //如存在会覆盖，怎样判断文件已存在？
+    if err != nil {
+        panic(err)
+    }
+    f.WriteString("this is sun")
+    defer f.Close()
+}
+```
+
+### 逐行读取/处理文件
+
+```go
+//1
+func ReadLine(fileName string) error {
+    f, err := os.Open(fileName)
+    if err != nil {
+        return err
+    }
+    buf := bufio.NewReader(f)
+    for {
+        line, err := buf.ReadString('\n')
+        line = strings.TrimSpace(line)
+        // handler(line)
+        fmt.Println(line, "okkkk")
+        if err != nil {
+            if err == io.EOF { //判断是否到了文件结尾
+                return nil
+            }
+            return err
+        }
+    }
+    return nil
+}
+
+func main() {
+    file := "C:\\tips.md"
+    ReadLine(file)
+
+}
+
+//2
+func main() {
+    file, err := os.Open("C:/tips.md")
+    if err != nil {
+        panic(err)
+    }
+
+    br := bufio.NewReader(file)
+    for {
+        a, _, c := br.ReadLine()
+        if c == io.EOF {
+            break
+        }
+        fmt.Println(string(a), "okkkk")
+    }
+
+}
+
+//3 使用Scanner —— 推荐
+func main() {
+    input := "This is The Golang Standard Library.\nWelcome you!"
+    scanner := bufio.NewScanner(strings.NewReader(input))
+    for scanner.Scan() {
+        fmt.Println(scanner.Text())
+    }
+}
+```
+
+### `bufio.Scanner`的使用
+
+```go
+// 扫描有多少个单词
+func main() {
+    input := "This is The Golang Standard Library.\nWelcome you!"
+    scanner := bufio.NewScanner(strings.NewReader(input))
+    scanner.Split(bufio.ScanWords) //没有指定split 则默认是逐行
+    count := 0
+    for scanner.Scan() {
+        count++
+    }
+    if err := scanner.Err(); err != nil {
+        fmt.Println("error")
+    }
+    fmt.Println(count)  //8
+}
+```
+
+
+## 字符串操作
+
+### 分割/连接字符串
+
+```go
+//使用strings.Fileds
+fmt.Printf("%q", strings.Fields("  a b c haha")) //["a" "b" "c" "haha"]
+
+//使用Split
+fmt.Println(strings.Split("abchaha", "c"))  //[ab haha]
+
+//SplitAfter 保留分隔符
+fmt.Println(strings.SplitAfter("abc,haha,sun", ",")) //[abc, haha, sun]
+
+//Join
+fmt.Println(Join([]string{"name=xxx", "age=xx"}, "&"))  // 输出 name=xxx&age=xx
+```
+
+### 数组去重去空
 
 ```go
 func removeDuplicatesAndEmpty(a []string) (ret []string) {
@@ -25,7 +208,7 @@ func main() {
 ```
 
 
-## 生成随机数
+### 生成随机数
 
 ```go
 /**
@@ -62,7 +245,7 @@ func main() {
 ```
 
 
-## 统计字符串长度
+### 统计字符串长度
 
 可以通过代码 `len([]int32(s))` 来获得字符串中字符的数量，但使用 `utf8.RuneCountInString(s)` 效率会更高一点。
 
@@ -72,40 +255,7 @@ l := utf8.RuneCountInString(s)
 ```
 
 
-## 关闭文件操作
-
-如果你在一个 for 循环内部处理一系列文件，你需要使用 defer 确保文件在处理完毕后被关闭，例如：
-
-```go
-for _, file := range files {
-    if f, err = os.Open(file); err != nil {
-        return
-    }
-    // 这是错误的方式，当循环结束时文件没有关闭
-    defer f.Close()
-    // 对文件进行操作
-    f.Process(data)
-}
-```
-
-但是在循环结尾处的 defer 没有执行，所以文件一直没有关闭！垃圾回收机制可能会自动关闭文件，但是这会产生一个错误，更好的做法是：
-
-```go
-for _, file := range files {
-    if f, err = os.Open(file); err != nil {
-        return
-    }
-    // 对文件进行操作
-    f.Process(data)
-    // 关闭文件
-    f.Close()
- }
-```
-
-defer 仅在函数返回时才会执行
-
-
-## 频繁修改字符串
+### 频繁修改字符串
 
 当需要对一个字符串进行频繁的操作时，谨记在 go 语言中字符串是不可变的（类似 java 和 c#）。使用诸如`a += b`形式连接字符串效率低下，尤其在一个循环内部使用这种形式。这会导致大量的内存开销和拷贝。应该使用一个字符数组代替字符串，将字符串内容写入一个缓存中。例如以下的代码示例：
 
@@ -121,7 +271,27 @@ for condition {
 注意：由于编译优化和依赖于使用缓存操作的字符串大小，当循环次数大于 15 时，效率才会更佳。
 
 
-## 修改字符串中的某个字符
+### 遍历字符串
+
+```go
+func main() {
+    s := "abc我是"
+    for i, n := 0, len(s); i < n; i++ {  // byte 方式
+        fmt.Printf("%c", s[i])
+    }
+    fmt.Println()
+
+    for _, v := range s {  // rune 方式
+        fmt.Printf("%c", v)
+    }
+}
+
+//
+abcææ¯
+abc我是
+```
+
+### 修改字符串中的某个字符
 
 Go 语言中的字符串是不可变的，也就是说 str[index] 这样的表达式是不可以被放在等号左侧的。如果尝试运行 str[i] = 'D' 会得到错误：cannot assign to str[i]。
 
