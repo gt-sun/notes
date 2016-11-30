@@ -166,6 +166,16 @@ func main() {
 
 ## 字符串操作
 
+### 输出这样一句话：This is "studygolang.com" website. 该如何做？
+
+3种方法：
+
+```
+fmt.Println(`this is "my home" yes?`)
+fmt.Println("this is \"my home\" yes?")
+fmt.Println("this is", strconv.Quote("my home"), "yes?")
+```
+
 ### 分割/连接字符串
 
 ```go
@@ -340,7 +350,9 @@ copy(b[:], s)
 - int
 
 ```
-        strconv.ParseInt()
+str := "123"
+i, _ := strconv.Atoi(str)
+fmt.Println(i)
 ```
 
 - bool 
@@ -355,12 +367,7 @@ copy(b[:], s)
 - string
 
 ```
-        // 通过Itoa方法转换  
-        str1 := strconv.Itoa(i)  
-        // 通过Sprintf方法转换  
-        str2 := fmt.Sprintf("%d", i)  
-        // 通过FormatInt转换
-        str3 = strconv.FormatInt()
+str1 := strconv.Itoa(i)  
 ```
 
 - float
