@@ -324,6 +324,10 @@ var b [4]byte
 copy(b[:], s)
 ```
 
+>Ps：
+无论从 []byte 到 string 还是 string 到 []byte，他们的指针地址均不同。说明在类型转换的时候，发生了值拷贝，而 []byte 与 string 并不共享内存。
+
+
 
 ### string 转换其他
 
