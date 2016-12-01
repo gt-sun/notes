@@ -5,15 +5,13 @@
 在下面的代码段中，我们创建一个 `buffer`，通过 `buffer.WriteString(s)` 方法将字符串 s 追加到后面，最后再通过 `buffer.String()` 方法转换为 string：
 
 ```go
-var buffer bytes.Buffer
-for {
-    if s, ok := getNextString(); ok { //method getNextString() not shown here
-        buffer.WriteString(s)
-    } else {
-        break
-    }
+func main() {
+    var buf bytes.Buffer
+    s := "abc天气好"
+    buf.WriteString(s)
+    buf.WriteString(" 是的呀")
+    fmt.Print(buf.String())
 }
-fmt.Print(buffer.String(), "\n")
 ```
 
 这种实现方式比使用 `+=` 要更节省内存和 CPU，尤其是要串联的字符串数目特别多的时候。
