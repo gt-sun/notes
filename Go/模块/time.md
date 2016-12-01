@@ -1,10 +1,53 @@
+[TOC]
+
+
+- time.Duration（时长，耗时）
+- time.Time（时间点）
+- time.C（放时间点的管道）`Time.C:=make(chan time.Time)`
+
+time 包里有 2 个东西，一个是时间点，另一个是时长
+时间点的意思就是 “某一刻”，比如 2000 年 1 月 1 日 1 点 1 分 1 秒 那一刻（后台记录的是 unix 时间，从 1970 年开始计算）
+时长就是某一刻与另一刻的差，也就是耗时
 
 
 ## Timer 相关函数或方法的使用
 
-通过 `time.After` 模拟超时：
+### `time.After`
+
+意思是多少时间之后，但在取出管道内容前不阻塞。
 
 ```go
+//1
+func main() {
+    println("the 1")
+    tc := time.After(3 * time.Second)
+    println("the 2")
+    println("the 3")
+    <-tc
+    println("the 4")
+}
+
+//
+the 1
+the 2
+the 3
+(waitting 3 Sec...)
+the 4
+
+
+//2
+func main() {
+    println("the 1")
+    tc := time.After(3 * time.Second)
+    println("the 2")
+    time.Sleep(4 * time.Second)
+    <-tc // 这里不会等待，因为上面4 大于 3
+    println("the 4")
+}
+```
+
+```go
+// 模拟超时
 c := make(chan int)
 
 go func() {
@@ -21,6 +64,40 @@ case <-time.After(2 * time.Second):
     fmt.Println("timeout...")
 }
 ```
+
+### AfterFunc 
+
+和 After 差不多，意思是多少时间之后在 goroutine line 执行函数
+
+```go
+f := func() {
+    fmt.Println("Time out")
+}
+time.AfterFunc(1*time.Second, f)
+time.Sleep(2 * time.Second) //要保证主线比子线“死的晚”，否则主线死了，子线也等于死了
+//【结果】运行了1秒后，打印出timeout，又过了1秒，程序退出
+//将一个间隔和一个函数给AfterFunc后
+//间隔时间过后，执行传入的函数
+```
+
+后悔的话，需要使用 Stop 命令来停止即将开始的执行，如果已经开始执行就来不及了，如下：
+
+```go
+houhui := true
+f := func() {
+    fmt.Println("Time out")
+}
+ta := time.AfterFunc(2*time.Second, f)
+time.Sleep(time.Second)
+if houhui {
+    ta.Stop()
+}
+time.Sleep(3 * time.Second)    //要保证主线比子线“死的晚”，否则主线死了，子线也等于死了
+//【结果】运行了3秒多一点点后，程序退出，什么都不打印
+//注册了个f函数，打算2秒后执行
+//过了1秒后，后悔了，停掉（Stop）它
+```
+
 
 `time.Stop` 停止定时器 或 `time.Reset` 重置定时器
 
@@ -50,6 +127,74 @@ time.Sleep(10 * time.Second)
 
 Reset 会先调用 stopTimer 再调用 startTimer，类似于废弃之前的定时器，重新启动一个定时器。返回值和 Stop 一样。
 
+
+## Tick 
+
+和 After 差不多，意思是每隔多少时间后，其他与 After 一致
+
+```go
+fmt.Println("the 1")
+tc:=time.Tick(time.Second) //返回一个time.C这个管道，1秒(time.Second)后会在此管道中放入一个时间点，
+                        //1秒后再放一个，一直反复，时间点记录的是放入管道那一刻的时间
+for i:=1;i<=2;i++{
+    <-tc
+    fmt.Println("hello")
+}
+//每隔1秒，打印一个hello
+```
+
+## time.Time的方法
+
+### Befor 和 After
+
+```go
+func main() {
+    t1 := time.Now()
+    time.Sleep(time.Second)
+    t2 := time.Now()
+    a := t2.After(t1)
+    b := t2.Before(t1)
+    println(a) //true
+    println(b) //false
+}
+```
+
+### Sub 方法
+
+```go
+func main() {
+    t1 := time.Now()
+    time.Sleep(time.Second)
+    t2 := time.Now()
+    sub := t2.Sub(t1)
+    println(sub.Seconds())
+}
+```
+
+### Add 方法
+
+```go
+func main() {
+    t1 := time.Now()
+    t2 := t1.Add(time.Hour)
+    println(t2.Hour())
+}
+```
+
+## time.Parse 方法
+
+```go
+func main() {
+    t, err := time.Parse(time.UnixDate, "Sat Mar  7 11:06:39 PST 2015") //默认是这种格式
+    if err != nil {
+        panic(err)
+    }
+    fmt.Println("default format:", t) //default format: 2015-03-07 11:06:39 +0000 PST
+    // 跟time.Now()格式一致
+
+    fmt.Println("Unix format:", t.Format(time.UnixDate)) //Unix format: Sat Mar  7 11:06:3
+}
+```
 
 ## 待研究代码
 
