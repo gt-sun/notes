@@ -51,6 +51,7 @@ defer db.Close()
 `db.Query()` 会传递连接给 sql.Rows 对象，直到完全遍历了所有的行或 Rows 的 Close 方法被调用了，连接才会返回给连接池。
 `db.QueryRow()` 会传递连接给 sql.Row 对象，当该对象的 Scan 方法被调用时，连接会返回给连接池。
 `db.Begin()` 会传递连接给 sql.Tx 对象，当该对象的 Commit 或 Rollback 方法被调用时，该链接会返回给连接池。
+`db.Prepare` 返回一个 Stmt。Stmt 对象可以执行 Exec,Query,QueryRow 等操作。
 
 从上面的解释可以知道，大部分时候，我们不需要关心连接不释放问题，它们会自动返回给连接池，只有 Query 方法有点特殊，后面讲解如何处理。
 
@@ -98,3 +99,187 @@ time.Sleep(20 * time.Second)
 ```
 
 通过 show processlist 命令，可以看到有两个是 Sleep 的连接。
+
+*实战*
+
+- Exec
+
+功能：执行不返回行（row）的查询，比如 INSERT，UPDATE，DELETE
+
+```go
+package main
+
+import (
+    "database/sql"
+
+    _ "github.com/go-sql-driver/mysql"
+)
+
+func main() {
+    db, _ := sql.Open("mysql", "root:123.com@tcp(192.168.8.211:3306)/test?charset=utf8")
+
+    db.Exec("INSERT INTO user(name,age,email) VALUES(?,?,?)", "Leo", 20, "Leo@q.com")
+
+}
+```
+
+- Query
+
+```go
+rows, err := db.Query("SELECT name from user")
+    if err != nil {
+        panic(err)
+    }
+    for rows.Next() {
+        var name string
+        if err := rows.Scan(&name); err != nil {
+            log.Fatal(err)
+        }
+        fmt.Println(name)
+    }
+
+    //遍历后 检查err
+    err = rows.Err()
+    if err != nil {
+        log.Fatal(err)
+}
+```
+
+*高效率批量执行SQL*
+
+```go
+    //Begin函数内部会去获取连接
+    tx,_ := db.Begin()
+    for i := 1301;i<=1400;i++{
+        //每次循环用的都是tx内部的连接，没有新建连接，效率高
+        tx.Exec("INSERT INTO user(uid,username,age) values(?,?,?)",i,"user"+strconv.Itoa(i),i-1000)
+    }
+    //最后释放tx内部的连接
+    tx.Commit()
+```
+
+- Columns 
+
+```go
+package main
+
+import (
+    "database/sql"
+    "fmt"
+
+    _ "github.com/go-sql-driver/mysql"
+)
+
+func main() {
+    db, err := sql.Open("mysql", "root:123.com@tcp(192.168.8.211:3306)/test?charset=utf8")
+    if err != nil {
+        panic(err.Error())
+    }
+
+    // defer db.Close()
+
+    rows, _ := db.Query("SELECT * from squareNum")
+    columns, err := rows.Columns()
+    if err != nil {
+        panic(err.Error()) // proper error handling instead of panic in your app
+    }
+
+    // Make a slice for the values
+    values := make([]sql.RawBytes, len(columns))
+
+    // rows.Scan wants '[]interface{}' as an argument, so we must copy the
+    // references into such a slice
+    // See http://code.google.com/p/go-wiki/wiki/InterfaceSlice for details
+    scanArgs := make([]interface{}, len(values))
+    for i := range values {
+        scanArgs[i] = &values[i]
+    }
+
+    // Fetch rows
+    for rows.Next() {
+        // get RawBytes from data
+        err = rows.Scan(scanArgs...)
+        if err != nil {
+            panic(err.Error()) // proper error handling instead of panic in your app
+        }
+
+        // Now do something with the data.
+        // Here we just print each column as a string.
+        var value string
+        for i, col := range values {
+            // Here we can check if the value is nil (NULL value)
+            if col == nil {
+                value = "NULL"
+            } else {
+                value = string(col)
+            }
+            fmt.Println(columns[i], ": ", value)
+        }
+        fmt.Println("-----------------------------------")
+    }
+    if err = rows.Err(); err != nil {
+        panic(err.Error()) // proper error handling instead of panic in your app
+    }
+}
+
+```
+
+## 官方实例
+
+In this example we prepare two statements - one for inserting tuples (rows) and one to query.
+
+```go
+package main
+
+import (
+    "database/sql"
+    "fmt"
+    _ "github.com/go-sql-driver/mysql"
+)
+
+func main() {
+    db, err := sql.Open("mysql", "user:password@/database")
+    if err != nil {
+        panic(err.Error())  // Just for example purpose. You should use proper error handling instead of panic
+    }
+    defer db.Close()
+
+    // Prepare statement for inserting data
+    stmtIns, err := db.Prepare("INSERT INTO squareNum VALUES( ?, ? )") // ? = placeholder
+    if err != nil {
+        panic(err.Error()) // proper error handling instead of panic in your app
+    }
+    defer stmtIns.Close() // Close the statement when we leave main() / the program terminates
+
+    // Prepare statement for reading data
+    stmtOut, err := db.Prepare("SELECT squareNumber FROM squarenum WHERE number = ?")
+    if err != nil {
+        panic(err.Error()) // proper error handling instead of panic in your app
+    }
+    defer stmtOut.Close()
+
+    // Insert square numbers for 0-24 in the database
+    for i := 0; i < 25; i++ {
+        _, err = stmtIns.Exec(i, (i * i)) // Insert tuples (i, i^2)
+        if err != nil {
+            panic(err.Error()) // proper error handling instead of panic in your app
+        }
+    }
+
+    var squareNum int // we "scan" the result in here
+
+    // Query the square-number of 13
+    err = stmtOut.QueryRow(13).Scan(&squareNum) // WHERE number = 13
+    if err != nil {
+        panic(err.Error()) // proper error handling instead of panic in your app
+    }
+    fmt.Printf("The square number of 13 is: %d", squareNum)
+
+    // Query another number.. 1 maybe?
+    err = stmtOut.QueryRow(1).Scan(&squareNum) // WHERE number = 1
+    if err != nil {
+        panic(err.Error()) // proper error handling instead of panic in your app
+    }
+    fmt.Printf("The square number of 1 is: %d", squareNum)
+}
+```
