@@ -1,0 +1,278 @@
+#运行用户
+#user  nobody;
+
+
+#启动进程，通常设置成和cpu的数量相等或者2倍于cpu的个数(具体结合cpu和内存)。默认为1
+worker_processes  1;
+#全局的错误日志和日志级别[ debug | info | notice | warn | error | crit ]
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid进程文件
+#pid        logs/nginx.pid;
+
+#一个nginx进程打开的最多文件描述符数目，理论值应该是最多打开文件数（系统的值ulimit -n）
+#与nginx进程数相除，但是nginx分配请求并不均匀，所以建议与ulimit -n的值保持一致。
+#默认不需设置
+#worker_rlimit_nofile 65535;
+
+#工作模式以及连接数上限
+events {
+    #epoll是多路复用IO(I/O Multiplexing)中的一种方式，
+    #仅用于linux2.6以上内核，可以大大的提高nginx的性能
+    #参考事件模型，use [ kqueue | rtsig | epoll | /dev/poll | select | poll ];
+    #在FreeBSD上面，就用kqueue模型
+    #window下没有epoll
+    use epoll;
+    worker_connections    200000;
+    }
+#设定http服务器
+http {
+    #设定mime类型,类型由mime.type文件定义。文件扩展名与文件类型映射表
+    include       mime.types;
+    
+    ##默认文件类型
+    default_type  application/octet-stream;
+    
+    #默认编码
+    #charset utf-8; 
+    
+    #服务器名字的hash表大小
+    #server_names_hash_bucket_size 128; 
+    
+    #上传文件大小限制
+    #client_header_buffer_size 32k; 
+    
+    #设定请求缓
+    #large_client_header_buffers 4 64k; 
+    
+    #表示最大上传大小
+    #client_max_body_size 8m; 
+    
+    #开启高效文件传输模式，sendfile指令指定nginx是否调用sendfile函数来输出文件，
+    #对于普通应用设为 on，如果用来进行下载等应用磁盘IO重负载应用，可设置为off，
+    #以平衡磁盘与网络I/O处理速度，降低系统的负载。注意：如果图片显示不正常把这个改成off。默认开启状态
+    sendfile on; 
+    
+    #开启目录列表访问，合适下载服务器，默认关闭。
+    #autoindex on; 
+    
+    #防止网络阻塞
+    #tcp_nopush on; 
+    
+    #防止网络阻塞
+    #tcp_nodelay on; 
+    
+    #长连接超时时间，单位是秒,能够让用户把页面加载完毕就行，太大是浪费
+    #keepalive_timeout 120; 
+    keepalive_timeout  15;
+    
+    #FastCGI相关参数是为了改善网站的性能：减少资源占用，提高访问速度。下面参数看字面意思都能理解。
+    #fastcgi_connect_timeout 300;
+    #fastcgi_send_timeout 300;
+    #fastcgi_read_timeout 300;
+    #fastcgi_buffer_size 64k;
+    #fastcgi_buffers 4 64k;
+    #fastcgi_busy_buffers_size 128k;
+    #fastcgi_temp_file_write_size 128k;
+
+    #gzip模块设置
+    #开启gzip压缩输出
+    gzip on; 
+    gzip_min_length 1k; #最小压缩文件大小
+    gzip_buffers 4 16k; #压缩缓冲区
+    gzip_http_version 1.0; #压缩版本（默认1.1，前端如果是squid2.5请使用1.0）
+    gzip_comp_level 6; #gzip压缩比，1压缩比最小处理速度最快，9压缩比最大但处理速度最慢(传输快但比较消耗cpu)
+    gzip_types text/plain application/x-javascript application/json text/css text/xml;
+    #压缩类型，默认就已经包含text/html，所以下面就不用再写了，写上去也不会有问题，但是会有一个warn。
+    gzip_vary on;   和http头有关系，加个vary头，给代理服务器用的，有的浏览器支持压缩，有的不支持。
+因此，为避免浪费不支持的也压缩，需要根据客户端的HTTP头来判断，是否需要压缩。
+        gzip_disable   "MSIE [1-6]\.";
+        include vhost/www.conf;   #include 必须放在server 之前；
+        open_file_cache max=655350 inactive=20s;  #静态文件缓存，最大缓存数量，文件未使用存活期
+        open_file_cache_valid 30s;   #验证缓存有效期时间间隔
+        open_file_cache_min_uses 2;   #有效期内文件最少使用次数
+    
+    upstream www.xttblog.com {
+        #upstream的负载均衡，weight是权重，可以根据机器配置定义权重。weigth参数表示权值，权值越高被分配到的几率越大。
+        #server 192.168.80.121:80 weight=3;
+        
+        #每个请求按访问ip的hash结果分配，这样每个访客固定访问一个后端服务器，可以解决session的问题。
+        ip_hash;
+        
+        server 10.10.2.71:8080;
+        #server 192.168.80.123:80 weight=3;
+    }
+    
+    #设定日志格式
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #access日志文件的路径,采用上面定义的main 格式记录
+    #access_log  logs/access.log  main;   
+$remote_addr, $http_x_forwarded_for 记录客户端IP地址
+$remote_user 记录客户端用户名称
+$request 记录请求的URL和HTTP协议
+$status 记录请求状态
+$body_bytes_sent 发送给客户端的字节数，不包括响应头的大小； 该变量与Apache模块mod_log_config里的“%B”参数兼容。
+$bytes_sent 发送给客户端的总字节数。
+$connection 连接的序列号。
+$connection_requests 当前通过一个连接获得的请求数量。
+$msec 日志写入时间。单位为秒，精度是毫秒。
+$pipe 如果请求是通过HTTP流水线(pipelined)发送，pipe值为“p”，否则为“.”。
+$http_referer 记录从哪个页面链接访问过来的
+$http_user_agent 记录客户端浏览器相关信息
+$request_length 请求的长度（包括请求行，请求头和请求正文）。
+$request_time 请求处理时间，单位为秒，精度毫秒； 从读入客户端的第一个字节开始，直到把最后一个字符发送给客户端后进行日志写入为止。
+$time_iso8601 ISO8601标准格式下的本地时间。
+$time_local 通用日志格式下的本地时间。
+    #虚拟主机的配置
+    server {
+        listen       80;
+        
+        #域名可以有多个，用空格隔开
+        server_name  localhost;     
+
+        #编码
+        charset utf-8;
+
+        #access_log  logs/host.access.log  main;
+
+        #默认请求
+        location / {
+            proxy_pass http://www.xttblog.com;
+            proxy_redirect off;
+            proxy_set_header X-Real-IP $remote_addr;
+            
+            #后端的Web服务器可以通过X-Forwarded-For获取用户真实IP
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            
+            #以下是一些反向代理的配置，可选。
+            proxy_set_header Host $host;
+        
+            #定义服务器的默认网站根目录位置
+            root D:/apache-tomcat-6.0.41/webapps/test;
+            
+            #定义首页索引文件的名称。定义多个用空格分隔
+            index index.jsp;
+        }
+        
+        #定义404错误提示页面
+        #error_page  404              /404.html;
+        
+        #定义50x错误提示页面
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            #定义服务器的默认网站错误页面位置
+            root   html;
+        }
+
+        #静态文件，nginx自己处理。正则表达式
+        #location ~ ^/(images|javascript|js|css|flash|media|static|htm|html|gif|jpg|jpeg|png|bmp|swf|ioc|rar|zip|txt|flv|mid|doc|ppt|pdf|xls|mp3|wma)/ {
+            #过期30天，静态文件不怎么更新，过期可以设大一点，
+            #如果频繁更新，则可以设置得小一点。
+            #expires 30d;
+        #}
+        
+        #禁止访问 .htxxx 文件
+        #location ~ /\.ht {
+        #    deny  all;
+        #}
+        
+        #对 "/" 启用反向代理
+        #location / {
+            #proxy_pass http://127.0.0.1:88;
+            #proxy_redirect off;
+            #proxy_set_header X-Real-IP $remote_addr;
+            
+            #后端的Web服务器可以通过X-Forwarded-For获取用户真实IP
+            #proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            
+            #以下是一些反向代理的配置，可选。
+            #proxy_set_header Host $host;
+            
+            #允许客户端请求的最大单文件字节数
+            #client_max_body_size 10m; 
+            
+            #缓冲区代理缓冲用户端请求的最大字节数
+            #client_body_buffer_size 128k; 
+            
+            #nginx跟后端服务器连接超时时间(代理连接超时)
+            #proxy_connect_timeout 90; 
+            
+            #后端服务器数据回传时间(代理发送超时)
+            #proxy_send_timeout 90; 
+            
+            #连接成功后，后端服务器响应时间(代理接收超时)
+            #proxy_read_timeout 90; 
+            
+            #设置代理服务器（nginx）保存用户头信息的缓冲区大小
+            #proxy_buffer_size 4k; 
+            
+            #proxy_buffers缓冲区，网页平均在32k以下的设置
+            #proxy_buffers 4 32k; 
+            
+            #高负荷下缓冲大小（proxy_buffers*2）
+            #proxy_busy_buffers_size 64k; 
+            
+            #设定缓存文件夹大小，大于这个值，将从upstream服务器传
+            #proxy_temp_file_write_size 64k;
+        #}
+        
+        #设定查看Nginx状态的地址
+        #location /NginxStatus {
+            #stub_status on;
+            #access_log on;
+            #auth_basic "NginxStatus";
+            #auth_basic_user_file conf/htpasswd;
+            #htpasswd文件的内容可以用apache提供的htpasswd工具来产生。
+        #}
+        
+        #本地动静分离反向代理配置
+        #所有jsp的页面均交由tomcat或resin处理
+        #location ~ .(jsp|jspx|do)?$ {
+            #proxy_set_header Host $host;
+            #proxy_set_header X-Real-IP $remote_addr;
+            #proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            #proxy_pass http://127.0.0.1:8080;
+        #}
+        
+    }
+
+
+    #另一个虚拟主机使用混合的IP的配置
+    #server {
+    #    listen       8000;
+    #    listen       somename:8080;
+    #    server_name  somename  alias  another.alias;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+
+    #HTTPS server的配置，默认不开启
+    #server {
+    #    listen       443 ssl;
+    #    server_name  localhost;
+
+    #    ssl_certificate      cert.pem;
+    #    ssl_certificate_key  cert.key;
+
+    #    ssl_session_cache    shared:SSL:1m;
+    #    ssl_session_timeout  5m;
+
+    #    ssl_ciphers  HIGH:!aNULL:!MD5;
+    #    ssl_prefer_server_ciphers  on;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+}
