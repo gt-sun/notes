@@ -10,6 +10,86 @@ time 包里有 2 个东西，一个是时间点，另一个是时长
 时长就是某一刻与另一刻的差，也就是耗时
 
 
+## 时区，`time.LoadLocation()`
+
+```go
+func main() {
+    t, _ := time.LoadLocation("")  //默认UTC
+    fmt.Println(time.Now().In(t))
+
+    t2, _ := time.LoadLocation("Local")  //使用机器本地的
+    fmt.Println(time.Now().In(t2))
+
+    t3, _ := time.LoadLocation("America/Los_Angeles")  //指定时区
+    fmt.Println(time.Now().In(t3))
+}
+
+//2016-12-06 11:42:51.0490205 +0000 UTC
+//2016-12-06 19:42:51.0490205 +0800 CST
+//2016-12-06 03:42:51.0655643 -0800 PST
+```
+
+## 格式化
+
+- 月：01 或 Jan 都可以
+- 小时：03 表示 12 小时制，15 表示 24 小时制。
+- 时差：是 -07 ，不是 07, 后边可以增加 “00” 或 “:00”，表示更进一步的分秒时差。
+- 上下午：使用 PM，不是 AM。
+- 摆放顺序：随意，甚至重复都可以。源代码包也有定义的常用的摆放方式供使用。
+
+```go
+func main() {
+    formate := "2006-01-02 15:04:05"  //这里的时间不能改
+    now := time.Now()
+
+    t, _ := time.LoadLocation("Asia/Shanghai")
+    fmt.Println(now.In(t).Format(formate))
+}
+```
+
+## 时间初始化
+
+时间初始化
+除了最常用的 time.Now，go 还提供了通过 unix 标准时间、字符串两种方式来初始化：
+
+```
+//通过字符串，默认UTC时区初始化Time
+func Parse(layout, value string) (Time, error) 
+//通过字符串，指定时区来初始化Time
+func ParseInLocation(layout, value string, loc *Location) (Time, error) 
+
+//通过unix 标准时间初始化Time
+func Unix(sec int64, nsec int64) Time
+```
+
+时间初始化的时候，一定要注意原始输入值的时区。正好手里有一个变量，洛杉矶当地时间 `“2016-11-28 19:36:25”`，unix 时间精确到秒为 `1480390585` 。将其解析出来的代码如下：
+
+```go
+local, _ := time.LoadLocation("America/Los_Angeles")
+timeFormat := "2006-01-02 15:04:05"
+
+time1 := time.Unix(1480390585, 0)   //通过unix标准时间的秒，纳秒设置时间
+time2, _ := time.ParseInLocation(timeFormat, "2016-11-28 19:36:25", local)
+
+fmt.Println(time1.In(local).Format(timeFormat))
+fmt.Println(time2.In(local).Format(timeFormat))
+
+chinaLocal, _ := time.LoadLocation("Local")//运行时，该服务器必须设置为中国时区，否则最好是采用"Asia/Chongqing"之类具体的参数。
+
+fmt.Println(time2.In(chinaLocal).Format(timeFormat))
+
+//output:
+//2016-11-28 19:36:25
+//2016-11-28 19:36:25
+//2016-11-29 11:36:25
+```
+
+当然，如果输入值是字符串，且带有时区
+
+> “2016-12-04 15:39:06 +0800 CST”
+
+则不需要采用 `ParseInLocation` 方法，直接使用 `Parse` 即可。
+
 ## Timer 相关函数或方法的使用
 
 ### `time.After`
