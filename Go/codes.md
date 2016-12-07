@@ -96,7 +96,7 @@ for _, file := range files {
     if f, err = os.Open(file); err != nil {
         return
     }
-    // 这是错误的方式，当循环结束时文件没有关闭
+    // 这是错误的方式，当循环结束时才会关闭，仅关闭了最后一个file
     defer f.Close()
     // 对文件进行操作
     f.Process(data)
@@ -247,6 +247,9 @@ func main() {
     fmt.Println(count)  //8
 }
 ```
+
+### 在文件里追加内容
+待
 
 
 ## 字符串操作
