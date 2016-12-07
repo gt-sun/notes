@@ -79,6 +79,14 @@ func main() {
 
 ## IO操作
 
+### 检查文件是否存在
+
+```go
+if _, err := os.Stat("C:\\tips2.md"); os.IsNotExist(err) {
+        fmt.Println("不存在该文件")
+    }
+```
+
 ### 关闭文件操作
 
 如果你在一个 for 循环内部处理一系列文件，你需要使用 defer 确保文件在处理完毕后被关闭，例如：
@@ -255,6 +263,8 @@ fmt.Println("this is", strconv.Quote("my home"), "yes?")
 
 ### 分割/连接字符串
 
+Go 里面 `string` 是最基础的类型，是一个只读类型，针对他的每一个操作都会创建一个新的 string。
+
 ```go
 //使用strings.Fileds
 fmt.Printf("%q", strings.Fields("  a b c haha")) //["a" "b" "c" "haha"]
@@ -356,6 +366,13 @@ for condition {
 ```
 
 注意：由于编译优化和依赖于使用缓存操作的字符串大小，当循环次数大于 15 时，效率才会更佳。
+
+
+如果是少量小文本拼接，用 `+` 就好
+
+如果是大量小文本拼接，用 `strings.Join`
+
+如果是大量大文本拼接，用 `bytes.Buffer`
 
 
 ### 遍历字符串

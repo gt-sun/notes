@@ -22,3 +22,14 @@ copy(slice2, slice1) // 只会复制slice1的前3个元素到slice2中
 copy(slice1, slice2) // 只会复制slice2的3个元素到slice1的前3个位置
 ```
 
+使用`copy`连接字符串效率最高
+
+```go
+func main() {
+    s := make([]byte, 5)
+    copy(s[:], "abcd")
+    copy(s[4:], `e`)
+    fmt.Println(string(s))
+}
+```
+
