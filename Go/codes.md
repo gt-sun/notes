@@ -1,6 +1,48 @@
 [TOC]
 
 
+## 运行外部命令
+
+Go 标准库为我们封装了更好用的包： `os/exec`，运行外部命令，应该优先使用它，它包装了 `os.StartProcess` 函数以便更容易的重定向标准输入和输出，使用管道连接 I/O，以及作其它的一些调整。
+
+*StartProcess* 方法
+
+```go
+func main() {
+// 1) os.StartProcess //
+/*********************/
+/* Linux: */
+env := os.Environ()
+procAttr := &os.ProcAttr{
+            Env: env,
+            Files: []*os.File{
+                os.Stdin,
+                os.Stdout,
+                os.Stderr,
+            },
+        }
+// 1st example: list files
+pid, err := os.StartProcess("/bin/ls", []string{"ls", "-l"}, procAttr)  
+if err != nil {
+        fmt.Printf("Error %v starting process!", err)  //
+        os.Exit(1)
+}
+fmt.Printf("The process id is %v", pid)
+```
+
+*os.Run* 方法
+
+```go
+　　func main() {
+　　  cmd := exec.Command("/bin/sh", "-c", `ps -eaf|grep "nginx: master"|grep -v "grep"|awk '{print $2}'`)
+　　  cmd.Stdout = os.Stdout
+　　  cmd.Stderr = os.Stderr
+　　  cmd.Start()
+　　  cmd.Run()
+　　  cmd.Wait()
+　　}
+```
+
 ## 实现一个限速器
 
 在操作数据库的时候，频率太快会把db压垮。
@@ -119,7 +161,41 @@ for _, file := range files {
 
 defer 仅在函数返回时才会执行
 
-### `ioutil.ReadFile`读取文件
+### `io/ioutil`
+
+#### `ioutil.ReadDir` 读取目录
+
+不会读取子目录，按文件夹名排序输出。
+
+```go
+func main() {
+    files, err := ioutil.ReadDir("C:\\Users\\sun\\Documents\\git\\notes\\Go")
+    if err != nil {
+        panic(err)
+    }
+
+    for _, file := range files {
+        fmt.Println(file.Name())
+    }
+}
+```
+
+#### `ioutil.ReadAll` 读取
+
+```go
+func main() {
+    r := strings.NewReader("Go is a general-purpose language designed with systems programming in mind.")
+
+    b, err := ioutil.ReadAll(r)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+    fmt.Printf("%s", b)
+}
+```
+
+#### `ioutil.ReadFile`读取文件
 
 ```go
 
@@ -141,7 +217,7 @@ func main() {
 }
 ```
 
-### `ioutil.WriteFile`写入文件
+#### `ioutil.WriteFile`写入文件
 
 ```go
 import "io/ioutil"
@@ -161,7 +237,7 @@ func main() {
 
 ```go
 func main() {
-    f, err := os.Create("sun.log") //如存在会覆盖，怎样判断文件已存在？
+    f, err := os.Create("sun.log")
     if err != nil {
         panic(err)
     }
@@ -221,10 +297,26 @@ func main() {
 
 //3 使用Scanner —— 推荐
 func main() {
+    //读取字符串
     input := "This is The Golang Standard Library.\nWelcome you!"
     scanner := bufio.NewScanner(strings.NewReader(input))
     for scanner.Scan() {
         fmt.Println(scanner.Text())
+    }
+    if err := scanner.Err(); err != nil {
+        fmt.Fprintln(os.Stderr, "reading standard input:", err)
+    }
+}
+
+func main() {
+    // 读取文件
+    file, _ := os.Open("C:\\tips.md")
+    scanner := bufio.NewScanner(file)
+    for scanner.Scan() {
+        fmt.Println(scanner.Text())
+    }
+    if err := scanner.Err(); err != nil {
+        fmt.Fprintln(os.Stderr, "reading standard input:", err)
     }
 }
 ```
@@ -249,7 +341,20 @@ func main() {
 ```
 
 ### 在文件里追加内容
-待
+
+```go
+func main() {
+    file, err := os.OpenFile("C:\\temp\\01.txt", os.O_WRONLY|os.O_APPEND, 0666)
+    if err != nil {
+        panic(err)
+    }
+
+    _, err = file.Write([]byte("\r\nxxxxx\r\n"))
+    if err != nil {
+        panic(err)
+    }
+}
+```
 
 
 ## 字符串操作
