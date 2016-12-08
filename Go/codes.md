@@ -159,7 +159,7 @@ for _, file := range files {
  }
 ```
 
-defer 仅在函数返回时才会执行
+defer 仅在函数返回时才会执行。
 
 ### `io/ioutil`
 
@@ -353,6 +353,31 @@ func main() {
     if err != nil {
         panic(err)
     }
+}
+```
+
+### 文件拷贝
+
+```go
+func main() {
+    CopyFile("target.txt", "source.txt")
+    fmt.Println("Copy done!")
+}
+
+func CopyFile(dstName, srcName string) (written int64, err error) {
+    src, err := os.Open(srcName)
+    if err != nil {
+        return
+    }
+    defer src.Close()
+
+    dst, err := os.OpenFile(dstName, os.O_WRONLY|os.O_CREATE, 0644)
+    if err != nil {
+        return
+    }
+    defer dst.Close()
+
+    return io.Copy(dst, src)
 }
 ```
 
