@@ -1,6 +1,12 @@
 
 
 
+## 百度网盘
+
+F12 在console里：
+
+Object.defineProperty(this , 'navigator' , {value: { platform: ""}});
+
 ## chrome标签声音
 
 chrome://flags/#enable-tab-audio-muting
