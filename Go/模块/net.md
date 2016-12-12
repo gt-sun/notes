@@ -1,5 +1,11 @@
 # http子包
 
+链接：http://www.open-open.com/lib/view/open1473146369515.html
+
+http 并发：http://www.open-open.com/lib/view/open1466247930321.html
+
+http client 设置连接超时： http://www.open-open.com/lib/view/open1464080880528.html
+
 *简单的爬虫*
 
 ```go
