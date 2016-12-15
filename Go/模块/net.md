@@ -4,7 +4,38 @@
 
 # net
 
-先看一个`C/S`的模型
+## 实例
+
+### 下载一个网页
+
+```go
+func main() {
+    var (
+        host          = "www.apache.org"
+        port          = "80"
+        remote        = host + ":" + port
+        msg    string = "GET / \n"
+        data          = make([]byte, 4096)
+        read          = true
+        count         = 0
+    )
+    // 创建一个socket
+    con, err := net.Dial("tcp", remote)
+    // 发送我们的消息，一个http GET请求
+    io.WriteString(con, msg)
+    // 读取服务器的响应
+    for read {
+        count, err = con.Read(data)
+        read = (err == nil)
+        fmt.Printf(string(data[0:count]))
+    }
+    con.Close()
+}
+```
+
+### `C/S`的模型
+
+*最简单的*
 
 server.go
 
@@ -84,7 +115,132 @@ func main() {
 
 ```
 
+*版本2*
 
+server.go
+
+```go
+package main
+
+import (
+    "fmt"
+    "log"
+    "net"
+    "os"
+    "strings"
+)
+
+var mapUser map[string]int
+
+func main() {
+    var (
+        conn     net.Conn
+        listener net.Listener
+        err      error
+    )
+    mapUser = make(map[string]int)
+    fmt.Println("Start server...")
+    listener, err = net.Listen("tcp", "127.0.0.1:9000")
+    checker(err)
+
+    for {
+        conn, err = listener.Accept()
+        checker(err)
+        go do(conn)
+    }
+
+}
+
+func do(conn net.Conn) {
+    var buf []byte
+    var err error
+    for {
+        buf = make([]byte, 512)
+        _, err = conn.Read(buf)
+        checker(err)
+        input := string(buf)
+        ix := strings.Index(input, "says")
+        clientName := input[0 : ix-1]
+        mapUser[clientName] = 1
+        if strings.Contains(input, "SH") {
+            fmt.Println("关闭Server！")
+            os.Exit(0)
+        }
+
+        if strings.Contains(input, "WHO") {
+            displayList()
+        }
+        fmt.Printf("Recived from %s : %s\n", clientName, input)
+    }
+}
+
+func displayList() {
+    fmt.Println("This is client list:")
+    for k, v := range mapUser {
+        fmt.Printf("No:%d, client is %s\n", v, k)
+    }
+}
+
+func checker(err error) {
+    if err != nil {
+        log.Fatal(err)
+    }
+}
+
+```
+
+client.go
+
+```go
+package main
+
+import (
+    "bufio"
+    "fmt"
+    "log"
+    "net"
+    "os"
+    "strings"
+)
+
+var (
+    conn        net.Conn
+    err         error
+    inputReader *bufio.Reader
+    clientName  string
+    input       string
+)
+
+func main() {
+    fmt.Println("Start connecting server")
+    conn, err = net.Dial("tcp", "127.0.0.1:9000")
+    checker(err)
+
+    inputReader = bufio.NewReader(os.Stdin)
+    fmt.Println("First input your name __")
+    clientName, _ = inputReader.ReadString('\n')
+    trimmedclient := strings.Trim(clientName, "\r\n")
+
+    for {
+        fmt.Println("Send to server. Q for Quit. SH to shutdown server")
+        input, _ = inputReader.ReadString('\n')
+        trimmedInput := strings.Trim(input, "\r\n")
+        if trimmedInput == "Q" {
+            return
+        }
+        _, err = conn.Write([]byte(trimmedclient + " says :" + trimmedInput))
+        checker(err)
+    }
+
+}
+
+func checker(err error) {
+    if err != nil {
+        log.Fatal(err)
+    }
+}
+
+```
 
 ## http子包
 
@@ -96,26 +252,5 @@ http client 设置连接超时： http://www.open-open.com/lib/view/open14640808
 
 *简单的爬虫*
 
-```go
-import (
-    "fmt"
-    "io/ioutil"
-    "net/http"
-)
 
-func main() {
-    resp, err := http.Get("https://www.itjuzi.com/invstdeal")
-    if err != nil {
-        fmt.Println("http get error.")
-    }
-    defer resp.Body.Close()
-    body, err := ioutil.ReadAll(resp.Body)
-    if err != nil {
-        fmt.Println("http read error")
-        return
-    }
-
-    src := string(body)
-    fmt.Println(src)
-}
 ```

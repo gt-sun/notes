@@ -1,6 +1,30 @@
 [TOC]
 
 
+## 从控制台输入
+
+*fmt.Scanln*
+
+```go
+func main() {
+    var firstname, lastname string
+    fmt.Println("输入你的名字：")
+    fmt.Scanln(&firstname, &lastname) //以空格分割
+    fmt.Println("你的名字是：", firstname, lastname)
+}
+```
+
+*bufio.NewReader*
+
+```go
+func main() {
+    fmt.Println("请输入你的名字：")
+    inputer := bufio.NewReader(os.Stdin)
+    name, _ := inputer.ReadString('\n') //读取到'\n'为止
+    name = strings.Trim(name, "\r\n")
+    fmt.Println("你的名字是：", name)
+}
+```
 
 ## 运行外部命令
 
