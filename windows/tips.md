@@ -7,11 +7,6 @@
 1787962561
 f2ec-org
 
-## 百度网盘
-
-F12 在console里：
-
-Object.defineProperty(this , 'navigator' , {value: { platform: ""}});
 
 ## chrome标签声音
 
