@@ -1,6 +1,67 @@
 [TOC]
 
 
+
+## 生成随机数
+
+- 使用hash数
+
+```go
+func createPasswd() string {
+    t := time.Now()
+    h := md5.New()
+    io.WriteString(h, t.String())
+    passwd := fmt.Sprintf("%x", h.Sum(nil))
+    return passwd
+}
+```
+
+- 使用`math/rand`
+
+```go
+func main() {
+    for a := 0; a < 5; a++ {
+        i := rand.Intn(506)
+        fmt.Println(i) // 执行多次，结果都一样
+    }
+
+    fmt.Println("========使用种子=========")
+
+    s1 := rand.NewSource(32)
+    r1 := rand.New(s1)
+    for a := 0; a < 5; a++ {
+        fmt.Println(r1.Intn(100)) // 执行多次，结果都一样
+    }
+
+    fmt.Println("=========使用随机种子=========")
+
+    s2 := rand.NewSource(time.Now().Unix())
+    r2 := rand.New(s2)
+    for a := 0; a < 5; a++ {
+        fmt.Println(r2.Intn(100)) // 执行多次，结果不一样
+    }
+}
+```
+
+```go
+const letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_!@#$%"
+const long = len(letters)
+
+func main() {
+    fmt.Println(GenString(10))
+}
+
+func GenString(n int) string {
+    b := make([]byte, n)
+    s1 := rand.NewSource(time.Now().UnixNano())
+    r1 := rand.New(s1)
+    for i := range b {
+        b[i] = letters[r1.Intn(long)]
+    }
+    return string(b)
+}
+```
+
 ## 从控制台输入
 
 *fmt.Scanln*
