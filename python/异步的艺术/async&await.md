@@ -1,7 +1,121 @@
 [TOC]
 
-- 考虑到 Python 异步编程的（短暂）历史，可以理解人们会误认为 `async/await == asyncio`。我是说 `asyncio` 帮助我们可以在 Python 3.4 中实现异步编程，同时也是 Python 3.5 中引入`async/await`的推动因素。但是`async/await` 的设计意图就是为了让其足够灵活从而不需要依赖`asyncio`或者仅仅是为了适应这一框架而扭曲关键的设计决策。换句话说，`async/await` 延续了 Python 设计尽可能灵活的传统同时又非常易于使用（实现）。
+---
 
+> - 考虑到 Python 异步编程的（短暂）历史，可以理解人们会误认为 `async/await == asyncio`。我是说 `asyncio` 帮助我们可以在 Python 3.4 中实现异步编程，同时也是 Python 3.5 中引入`async/await`的推动因素。但是`async/await` 的设计意图就是为了让其足够灵活从而不需要依赖`asyncio`或者仅仅是为了适应这一框架而扭曲关键的设计决策。换句话说，`async/await` 延续了 Python 设计尽可能灵活的传统同时又非常易于使用（实现）。
+
+## 和 `concurrent.futures`区别
+
+The `asyncio` documentation covers the differences:
+
+```py
+class asyncio.Future(*, loop=None)
+
+This class is almost compatible with `concurrent.futures.Future`.
+
+Differences:
+
+- `result()` and `exception()` do not take a timeout argument and raise an exception when the future isn’t done yet.
+- Callbacks registered with `add_done_callback()` are always called via the event loop’s `call_soon_threadsafe()`.
+- This class is not compatible with the `wait()` and `as_completed()` functions in the `concurrent.futures` package.
+
+This class is not thread safe.
+```
+
+Basically, if you're using `ThreadPoolExecutor` or `ProcessPoolExecutor`, or want to use a `Future` directly for thread-based or process-based concurrency, use `concurrent.futures.Future`. If you're using `asyncio`, use `asyncio.Future`.
+
+`asyncio.Future` isn't **thread-safe** at all - it's only designed to be used in a single-threaded, asyncio-based application.
+
+`asyncio` provides a `Future` class that mimics the one in the `concurrent.futures` module, but adapted for use with the event loop;
+
+## 官方笔记
+
+**`call_later` `call_soon`**
+
+```py
+import asyncio
+import datetime
+
+
+def display_time(end_time, loop):
+    if (loop.time() + 1.0) < end_time:
+        loop.call_later(1, display_time, end_time, loop)
+    else:
+        print(datetime.datetime.now()) # 等待5秒后执行
+        loop.stop()
+
+loop = asyncio.get_event_loop()
+end_time = loop.time() + 5.0
+loop.call_soon(display_time, end_time, loop)
+
+loop.run_forever()
+loop.close()
+```
+
+
+## 廖雪峰
+
+```py
+import asyncio
+import threading
+
+@asyncio.coroutine
+def f():
+    print("Hello world ",threading.currentThread())
+    yield from asyncio.sleep(1)
+    print("Hello again! ",threading.currentThread())
+
+
+tasks = [f(),f()]
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(asyncio.wait(tasks))
+loop.close()
+```
+
+打印：
+
+```
+Hello world  <_MainThread(MainThread, started 8092)>
+Hello world  <_MainThread(MainThread, started 8092)>
+Hello again!  <_MainThread(MainThread, started 8092)>
+Hello again!  <_MainThread(MainThread, started 8092)>
+[Finished in 1.2s]
+```
+
+当前线程名称可以看出，两个coroutine是由同一个线程并发执行的。
+
+如果把`asyncio.sleep()`换成真正的 IO 操作，则多个coroutine就可以由一个线程并发执行。
+
+**aiohttp 实现简单的httpserver**
+
+```py
+import asyncio
+# import aiohttp
+from aiohttp import web
+
+
+async def index(request):
+    await asyncio.sleep(0.5)
+    return web.Response(body=b'<h1>Index</h1>',content_type="text/html")
+
+async def hello(request):
+    await asyncio.sleep(0.5)
+    text = '<h1>hello, %s!</h1>' % request.match_info['name']
+    return web.Response(body=text.encode('utf-8'),content_type="text/html")
+
+async def init(loop):
+    app = web.Application(loop=loop)
+    app.router.add_route('GET', '/', index)
+    app.router.add_route('GET', '/hello/{name}', hello)
+    srv = await loop.create_server(app.make_handler(), '127.0.0.1', 8000)
+    print('Server started at http://127.0.0.1:8000...')
+    return srv
+
+loop = asyncio.get_event_loop()
+loop.run_until_complete(init(loop))
+loop.run_forever()
+```
 
 
 ## 【博文】async/await 入门

@@ -8,7 +8,11 @@
 f2ec-org
 
 
-## chrome标签声音
+## chrome 技巧
+
+- chrome://net-internals/#hsts，添加域名之后，可以让浏览器强制对该域名启用 https，所有的 http 请求都会内部转到 https。
+
+- chrome标签声音
 
 chrome://flags/#enable-tab-audio-muting
 
