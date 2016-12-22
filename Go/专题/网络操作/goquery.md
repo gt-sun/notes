@@ -204,6 +204,43 @@ func main() {
 
 ### 其他实例
 
+- 使用`Each() + Eq()`循环遍历指定部分
+
+```go
+func PrintProxy(url string) {
+    g, e := goquery.NewDocument(url)
+    if e != nil {
+        fmt.Println(e)
+    }
+    g.Find("tr").Each(func(i int, s *goquery.Selection) {
+        if i > 0 && i < 3 {
+            node := s.Find("td")
+            IP := node.Eq(0)
+            Port := node.Eq(1)
+            fmt.Printf("%v:%v\n", IP.Text(), Port.Text())
+        }
+
+    })
+}
+```
+
+- 使用`Eq(index int)`来选取指定部分
+
+```go
+func main() {
+    g, e := goquery.NewDocument("http://gold.3g.cnfol.com/")
+    if e != nil {
+        fmt.Println(e)
+    }
+    c := g.Find("ul")
+    s := c.Eq(6).Find("a") //查找所有的ul，只在第6个ul内部操作。
+    s.Each(func(i int, content *goquery.Selection) {
+        a, _ := content.Attr("href")
+        fmt.Println(a)
+    })
+}
+```
+
 - 下载图片
 
 ```go
