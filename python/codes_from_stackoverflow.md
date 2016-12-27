@@ -1,6 +1,20 @@
 [TOC]
 
+## 安全的使用eval
 
+```py
+In [1]: import ast
+
+In [2]: a = '[1,2,3]'
+
+In [3]: ast.literal_eval(a)
+Out[3]: [1, 2, 3]
+
+In [4]: b = '1+2'
+
+In [5]: ast.literal_eval(b)
+Out[5]: 3
+```
 
 ## [1,2,3] to 123
 
