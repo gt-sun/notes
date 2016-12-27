@@ -5,6 +5,8 @@
 
 ## 使用说明
 
+### [sync.Mutex VS channel VS WaitGroup ](https://github.com/golang/go/wiki/MutexOrChannel)
+
 ### [channel需要关闭吗](http://stackoverflow.com/questions/8593645/is-it-ok-to-leave-a-channel-open)
 
 
@@ -52,25 +54,89 @@ func main() {
 ```
 
 
+总结一下 channel 关闭后 sender 的 receiver 操作。
+如果 channel c 已经被关闭, 继续往它发送数据会导致panic: `send on closed channel`:
+
+```go
+import "time"
+func main() {
+    go func() {
+        time.Sleep(time.Hour)
+    }()
+    c := make(chan int, 10)
+    c <- 1
+    c <- 2
+    close(c)
+    c <- 3
+}
+```
+
+但是从这个关闭的 channel 中不但可以读取出已发送的数据，还可以不断的读取零值:
+
+```go
+c := make(chan int, 10)
+c <- 1
+c <- 2
+close(c)
+fmt.Println(<-c) //1
+fmt.Println(<-c) //2
+fmt.Println(<-c) //0
+fmt.Println(<-c) //0
+```
+
+但是如果通过range读取，channel 关闭后 for 循环会跳出：
+
+```go
+c := make(chan int, 10)
+c <- 1
+c <- 2
+close(c)
+for i := range c {
+    fmt.Println(i)
+}
+```
+
 ## 重新理解
 
 
 
 **同步阻塞(较少使用)**
 
-以下代码是错的！！！
 
 ```go
 func main() {
     c := make(chan int)
-    go func() {
-        fmt.Println(<-c)
+    go func() { //1
+        time.Sleep(1e8) //2
+        fmt.Println(<-c) //4
     }()
-    c <- 10
+    c <- 10 //2 阻塞，等待4
 }
 
-//如果接收先执行，则没有输出；可以想象成取出还在很久后，main()是不会等待的，所以同步chan需先进行取出语句。
-//如果取出先执行，则正常输出；因为goroutine需等待main()函数结束才结束，所以会等到接收到值。
+//两处2 都有可能先执行到，但不影响。
+
+-----
+
+//可能有输出，可能无输出。主函数没有阻塞后，会立即结束。
+func main() {
+    c := make(chan int)
+    go func() { 
+        fmt.Println(<-c) //1
+        time.Sleep(1e9) //永远不会执行到。·
+    }()
+    c <- 10 //2
+}
+
+
+//肯定有输出
+func main() {
+    c := make(chan int)
+    go func() {
+        c <- 1
+    }()
+
+    fmt.Println(<-c)
+}
 ```
 
 我们知道，send 被执行前,通讯一直被阻塞着。无缓存的 channel 只有在 receiver 准备好后 send 才被执行。所以类似上面的代码可以修改为：
@@ -102,10 +168,9 @@ func main() {
     c := make(chan int)
     c <- 10
     fmt.Println(<-c)
-
 }
 
-// 这是错误的！因为同步chan必须先有取值的需求才可以接收值！改成c := make(chan int, 1)就对了。
+// 报错。发送导致阻塞，执行不到<-c
 ```
 
 ```go
@@ -116,37 +181,11 @@ func main() {
     go func() {
         c <- 10
     }()
-
 }
 
 // 这是错误的！因为<-c就阻塞了，不会执行下面的goroutine语句。
 ```
 
-```go
-package main
-
-func main() {
-    c := make(chan int)
-    go func() {
-        c <- 1
-    }()
-    <-c
-}
-
-//先有goroutine 后配合chan使用，<-c取出语句需放在goroutine下面。
-```
-
-```go
-// 单缓存chan，与无缓存相同，无法实现异步
-func main() {
-    c := make(chan bool, 1)
-    go func() {
-        c <- true
-    }()
-
-    fmt.Println(<-c)
-}
-```
 
 **多缓存异步chan(提高性能)**
 
@@ -158,7 +197,6 @@ func main() {
     for i := 0; i < 3; i++ {
         go func(i int) {
             c <- i * 10
-
         }(i)
     }
 
