@@ -1,6 +1,170 @@
 [TOC]
 
 
+## 获取变量的类型
+
+```go
+//Using string formatting
+
+func typeof(v interface{}) string {
+    return fmt.Sprintf("%T", v)
+}
+
+
+//Using reflect package
+
+func typeof(v interface{}) string {
+    return reflect.TypeOf(v).String()
+}
+
+
+//Using type assertions
+
+func typeof(v interface{}) string {
+    switch t := v.(type) {
+    case int:
+        return "int"
+    case float64:
+        return "float64"
+    //... etc
+    default:
+        _ = t
+        return "unknown"
+    }
+}
+```
+
+## 输出到Excel
+
+```go
+import (
+    "encoding/csv"
+    "os"
+)
+
+func main() {
+    f, err := os.Create("haha2.xls")
+    if err != nil {
+        panic(err)
+    }
+    defer f.Close()
+
+    f.WriteString("\xEF\xBB\xBF") // 写入UTF-8 BOM
+
+    w := csv.NewWriter(f)
+    w.Write([]string{"编号", "姓名", "年龄"})
+    w.Write([]string{"1", "张三", "23"})
+    w.Write([]string{"2", "李四", "24"})
+    w.Write([]string{"3", "王五", "25"})
+    w.Write([]string{"4", "赵六", "26"})
+    w.Flush()
+}
+```
+
+
+## 计算经纬度之间的距离
+
+```go
+func main() {
+    lat1 := 29.490295
+    lng1 := 106.486654
+
+    lat2 := 29.615467
+    lng2 := 106.581515
+    fmt.Println(EarthDistance(lat1, lng1, lat2, lng2))
+}
+
+// 返回值的单位为米
+func EarthDistance(lat1, lng1, lat2, lng2 float64) float64 {
+    radius := float64(6371000) // 6378137
+    rad := math.Pi / 180.0
+
+    lat1 = lat1 * rad
+    lng1 = lng1 * rad
+    lat2 = lat2 * rad
+    lng2 = lng2 * rad
+
+    theta := lng2 - lng1
+    dist := math.Acos(math.Sin(lat1)*math.Sin(lat2) + math.Cos(lat1)*math.Cos(lat2)*math.Cos(theta))
+
+    return dist * radius
+}
+```
+
+## 发送邮件
+
+```go
+func SendToMail(user, password, host, to, subject, body, mailtype string) error {
+    hp := strings.Split(host, ":")
+    auth := smtp.PlainAuth("", user, password, hp[0])
+    var content_type string
+    if mailtype == "html" {
+        content_type = "Content-Type: text/" + mailtype + "; charset=UTF-8"
+    } else {
+        content_type = "Content-Type: text/plain" + "; charset=UTF-8"
+    }
+
+    msg := []byte("To: " + to + "\r\nFrom: " + user + "\r\nSubject: " + subject + "\r\n" + content_type + "\r\n\r\n" + body)
+    send_to := strings.Split(to, ";")
+    err := smtp.SendMail(host, auth, user, send_to, msg)
+    return err
+}
+
+func main() {
+    user := "xxxxx@qq.com"
+    password := "xxxunx"
+    host := "smtp.qq.com:25"
+    to := "xxx@qq.com"
+
+    subject := "使用Golang发送邮件"
+
+    body := `
+        <html>
+        <body>
+        <h3>
+        "Test send to email"
+        </h3>
+        </body>
+        </html>
+        `
+    fmt.Println("send email")
+    err := SendToMail(user, password, host, to, subject, body, "html")
+    if err != nil {
+        fmt.Println("Send mail error!")
+        fmt.Println(err)
+    } else {
+        fmt.Println("Send mail success!")
+    }
+
+}
+```
+
+使用第三方包：
+
+`go get gopkg.in/gomail.v2`
+
+```go
+package main
+
+import gomail "gopkg.in/gomail.v2"
+
+func main() {
+    m := gomail.NewMessage()
+    m.SetHeader("From", "xxx@qq.com")
+    m.SetHeader("To", "xx@qq.com", "x@qq.com")
+    m.SetAddressHeader("Cc", "xxx@86l.com", "强")
+    m.SetHeader("Subject", "Hello!")
+    m.SetBody("text/html", "Hello <b>Bob</b> and <i>Cora</i>!")
+    m.Attach("02.go") //附件
+
+    d := gomail.NewDialer("smtp.qq.com", 25, "xxx@qq.com", "xxunxxxx")
+
+    if err := d.DialAndSend(m); err != nil {
+        panic(err)
+    }
+}
+
+```
 
 ## 生成随机数
 
@@ -269,7 +433,63 @@ func main() {
 }
 ```
 
+## 序列化
 
+```go
+import (
+    "encoding/gob"
+    "fmt"
+    "os"
+    "runtime"
+)
+
+const file = "/tmp/test.gob"
+
+type User struct {
+    Name, Pass string
+}
+
+func main(){
+    var datato = &User{"Donald","DuckPass"}
+    var datafrom = new(User)
+
+    err := Save(file, datato)
+    Check(err)
+    err = Load(file, datafrom)
+    Check(err)
+    fmt.Println(datafrom)
+}
+
+// Encode via Gob to file
+func Save(path string, object interface{}) error {
+    file, err := os.Create(path)
+    if err == nil {
+        encoder := gob.NewEncoder(file)
+        encoder.Encode(object)
+    }
+    file.Close()
+    return err
+ }
+
+// Decode Gob file
+func Load(path string, object interface{}) error {
+    file, err := os.Open(path)
+    if err == nil {
+        decoder := gob.NewDecoder(file)
+        err = decoder.Decode(object)
+    }
+    file.Close()
+    return err
+}
+
+func Check(e error) {
+    if e != nil {
+        _, file, line, _ := runtime.Caller(1)
+        fmt.Println(line, "\t", file, "\n", e)
+        os.Exit(1)
+    }
+}
+```
 
 
 ## 数据类型转换

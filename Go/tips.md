@@ -12,6 +12,17 @@ http://blog.jobbole.com/107613/
 http://mikespook.com/2014/07/%E5%8D%81%E6%9D%A1%E6%9C%89%E7%94%A8%E7%9A%84-go-%E6%8A%80%E6%9C%AF/
 
 
+
+## 包管理工具对比
+
+from： http://www.grdtechs.com/2016/05/24/comparison-of-Go-Vendoring-Tools/
+
+- godep,govendor,glide 都可以很好的进行包管理。govendor,glide提供的可操作命令更丰富。
+- godep 会在根目录生成Godeps和vendor两个文件夹; govendor把所有信息都生成在vendor目录下; glide 会在根目录下生成glide.yaml, glide.lock文件及vendor目录; 从简洁度和尽量不污染项目来看，govendor最优，glide次之。
+- godep, govendor, glide 都提供 get 第三方包的命令，但是 glide的glide install 最为方便， 并且直接把第三方包 get 到本项目的 vendor 目录下，并且glide提供的便捷命令也丰富。
+
+在生产项目中推荐使用govendor, 更简洁; 在试验项目中推荐试用glide, 更方便。
+
 ## 数组与切片的区别
 
 A, 数组是固定长度的，所以在创建时要指明长度，而切片长度是可变的，创建时不用标明长度，比如：

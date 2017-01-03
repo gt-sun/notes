@@ -31,6 +31,53 @@ func httpRequestHandler(w http.ResponseWriter, req *http.Request) {
 
 ## 实例
 
+### 实现静态文件服务器，类似python的`python -m SimpleHTTP`
+
+from: https://github.com/Unknwon/go-web-foundation/blob/master/lectures/lecture2/code/02_Go_HTTP/main_v2.go
+
+```go
+package main
+
+import (
+    "io"
+    "log"
+    "net/http"
+    "os"
+)
+
+type myHandler struct {
+}
+
+func (*myHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+    io.WriteString(w, "My server:"+r.URL.String())
+}
+
+func main() {
+    mux := http.NewServeMux()
+    mux.Handle("/", &myHandler{})
+    mux.HandleFunc("/bye", sayBye)
+
+    //实现静态文件
+    wd, err := os.Getwd()
+    if err != nil {
+        log.Fatal(err)
+    }
+    mux.Handle("/file/", http.StripPrefix("/file/", http.FileServer(http.Dir(wd))))
+
+    err = http.ListenAndServe(":9000", mux)
+    if err != nil {
+        log.Fatal(err)
+    }
+
+}
+
+func sayBye(w http.ResponseWriter, r *http.Request) {
+    io.WriteString(w, "Bye!")
+}
+
+```
+
+
 ### 简单的POST表单网页
 
 ```go
