@@ -7,6 +7,8 @@ http://stackoverflow.com/questions/23045968/increase-the-font-size-of-text-in-su
 
 ## 快捷键
 
+Ctrl + p  快速打开文件
+
 Alt + Shift + 2 进行左右分屏， Alt + Shift + 8 进行上下分屏
 Alt + Shift + 1 取消分屏
 

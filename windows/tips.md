@@ -2,6 +2,11 @@
 
 
 
+## 禁用软件保护服务
+
+HKLM\SYSTEM\CurrentControlSet\Services\sppsvc
+Modify "Start" from "whatever number is here" to 4
+
 ## 有道API
 
 1787962561
