@@ -1,6 +1,52 @@
 [TOC]
 
 
+
+## golang里面的Walk
+
+```go
+import (
+    "flag"
+    "fmt"
+    "os"
+    "path/filepath"
+)
+
+func visit(path string, f os.FileInfo, err error) error {
+    fmt.Printf("Visited: %s\n", path)
+    return nil
+}
+
+func main() {
+    flag.Parse()
+    root := flag.Arg(0)
+    err := filepath.Walk(root, visit)
+    fmt.Printf("filepath.Walk() returned %v\n", err)
+}
+```
+
+第三方库：
+
+```go
+import (
+    "fmt"
+    "os"
+
+    "github.com/kr/fs"
+)
+
+func main() {
+    walker := fs.Walk("C:\\tools\\Rolan")
+    for walker.Step() {
+        if err := walker.Err(); err != nil {
+            fmt.Fprintln(os.Stderr, err)
+            continue
+        }
+        fmt.Println(walker.Path())
+    }
+}
+```
+
 ## 获取变量的类型
 
 ```go
@@ -623,6 +669,15 @@ str1 := strconv.Itoa(i)
 使用encoding/binary包做转换
 
 ### interface转为string
+
+```go
+var a interface{} = 12
+
+func main() {
+    b := a.(int)
+    print(b) //12
+}
+```
 
 ```go
 func interface2string(inter interface{}) string {

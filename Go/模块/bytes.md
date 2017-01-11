@@ -1,3 +1,66 @@
+
+
+[TOC]
+
+---
+
+
+## `bytes.Buffer`配合`[]byte`使用
+
+```go
+var resbuf bytes.Buffer
+for {
+    res := make([]byte, 512)
+    n, err := outputBuf2.Read(res)
+    if err != nil {
+        if err == io.EOF {
+            break
+        } else {
+            panic(err)
+        }
+    }
+    if n > 0 {
+        resbuf.Write(res[:n])
+    }
+}
+fmt.Println(resbuf.String())
+```
+
+## 关于`bytes.Writer`的疑惑
+
+看代码：
+
+```go
+var buf bytes.Buffer
+
+func main() {
+    cmd := exec.Command("git", "version")
+    cmd.Stdout = &buf
+    err := cmd.Run()
+    if err != nil {
+        panic(err)
+    }
+    fmt.Println(buf.String())
+
+    if _, ok := interface{}(&buf).(io.Writer); ok {
+        println("&buf 是一个io.Writer")
+    }
+
+    if _, ok := interface{}(buf).(io.Writer); !ok {
+        println("buf 不是一个io.Writer")
+    }
+}
+```
+
+打印：
+
+```
+go version go1.7.3 windows/amd64
+
+&buf 是一个io.Writer
+buf 不是一个io.Writer
+```
+
 ## 通过 buffer 串联字符串
 
 类似于 Java 的 StringBuilder 类。
