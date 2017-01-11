@@ -1,6 +1,14 @@
 
 
 
+## 工具
+
+- ShareX  截屏/录屏等
+
+
+## 快捷键
+
+SnippingTool  
 
 ## 禁用软件保护服务
 
@@ -9,8 +17,8 @@ Modify "Start" from "whatever number is here" to 4
 
 ## 有道API
 
-1787962561
-f2ec-org
+API key：  1377346986
+keyfrom： bvaccc
 
 
 ## chrome 技巧
