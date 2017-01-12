@@ -1,6 +1,12 @@
 [TOC]
 
 
+链接：http://www.open-open.com/lib/view/open1473146369515.html
+
+http 并发：http://www.open-open.com/lib/view/open1466247930321.html
+
+http client 设置连接超时： http://www.open-open.com/lib/view/open1464080880528.html
+
 ## Tips
 
 ### 错误信息处理，避免到处都是`err != nil`

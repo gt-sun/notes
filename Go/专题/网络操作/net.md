@@ -4,6 +4,37 @@
 
 # net
 
+## Socket 编程
+
+```
+//监听
+listener,err := net.Listen("tcp","127.0.0.1:8080") 
+
+//等待请求
+conn,err := listener.Accept()
+
+//conn的Read方法
+var buf bytes.Buffer
+b := make([]byte,10)
+for {
+    n,err := conn.Read(b)
+    if err != nil{
+        if err == io.EOF{
+            print("conn is closed!")
+            conn.Close()
+        }else {
+            print("errer!")
+        }
+        break
+    }
+    buf.Write(b[:n])
+}
+
+//以上read简单粗暴，下面是带消息边界的读取
+r := bufio.NewReader(conn)
+line,err := r.ReadBytes('\n')
+```
+
 ## 实例
 
 
@@ -303,15 +334,4 @@ func checker(err error) {
 
 ```
 
-## http子包
 
-链接：http://www.open-open.com/lib/view/open1473146369515.html
-
-http 并发：http://www.open-open.com/lib/view/open1466247930321.html
-
-http client 设置连接超时： http://www.open-open.com/lib/view/open1464080880528.html
-
-*简单的爬虫*
-
-
-```

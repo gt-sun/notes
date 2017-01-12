@@ -1,5 +1,23 @@
 [TOC]
 
+---
+
+## Time 和 int64
+
+```go
+    var t time.Time
+    var i int64
+    
+    // Time -> int64
+    t = time.Now()
+    i = t.Unix()
+    fmt.Println(i)
+
+    // int64 -> Time    
+    t2 := time.Unix(i, 0)
+    fmt.Println(t2)
+```
+
 
 - time.Duration（时长，耗时）
 - time.Time（时间点）
