@@ -3,16 +3,84 @@
 ---
 
 
+
 ## 使用说明
 
-### [sync.Mutex VS channel VS WaitGroup ](https://github.com/golang/go/wiki/MutexOrChannel)
+- 特点
+ 
+    - 在同一时刻，仅有一个Goroutine能向一个通道发送数据，也仅有一个Goroutine能从通道接收数据。
+    - 最早被发送至通道的值会最早被接收，相当于一个FIFO先进先出的队列。
+    - 不应该在接收端关闭通道；在发送端关闭通道不会对已发送的值产生影响；
+    - 通道中元素的值具有不变形，如下：
+```go
+type Person struct {
+    Name    string
+    Age     int
+    Address Addr
+}
 
-### [channel需要关闭吗](http://stackoverflow.com/questions/8593645/is-it-ok-to-leave-a-channel-open)
+type Addr struct {
+    city     string
+    district string
+}
+
+func main() {
+    c := make(chan Person, 1)
+    p := Person{"sun", 12, Addr{"beijng", "haidiam"}}
+    c <- p
+    p.Address.city = "tianjin"
+    fmt.Println(<-c) //{sun 12 {beijng haidiam}}
+}
+```
+
+- 类型转换
+
+`<-chan int(v)` 和 `(<-chan int)(v)`
+
+前者：将v转换为chan int 类型并且取出值，等价于`<-(chan int(v))`
+后者：将v转换为取出类型的chan int
+
+- [sync.Mutex VS channel VS WaitGroup ](https://github.com/golang/go/wiki/MutexOrChannel)
+
+- [channel需要关闭吗](http://stackoverflow.com/questions/8593645/is-it-ok-to-leave-a-channel-open)
 
 
 It's OK to leave a Go channel open forever and never close it. When the channel is no longer used, it will be garbage collected.
 
 Note that it is only necessary to close a channel if the receiver is looking for a close. Closing the channel is a control signal on the channel indicating that no more data follows.
+
+## 对Goroutine的解释
+
+**证明并发性**
+
+```go
+func main() {
+    name := "Sun"
+    go func() {
+        print("hello,", name)
+    }()
+    name = "QQ"
+    time.Sleep(1e2)
+}
+```
+
+**使用for-range + go语句属于同步的范畴**
+
+输出顺序一致
+
+```go
+func main() {
+    names := []string{"A", "B", "C", "D"}
+    for _, name := range names {
+        go func(n string) {
+            print(n)
+        }(name)
+        runtime.Gosched() // 保证获得执行机会
+    }
+}
+```
+
+
 
 ## 判断channel是否关闭
 
@@ -355,4 +423,21 @@ func main() {
         fmt.Println(v)
     }
 }
+```
+
+
+## time包与channel
+
+### time.NewTimer定时器 和 time.After
+
+```go
+t := time.NewTimer(1e9)
+<-t.C
+print("Done")
+```
+
+等价：
+
+```go
+<-time.After(1e9)
 ```

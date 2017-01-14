@@ -1,6 +1,49 @@
 [TOC]
 
+## 拼接字符串
 
+字符串的拼接大概有以下几种方式
+
+- `fmt.Sprintf(“%s%s%d%s%s”,”hello”,”world”,2016,”come”,”on”)` 
+ 这种方式效率最低，但是代码最简单，最优雅
+- 使用”+” 拼接字符串 `“hello”+”world”+ strconv.FormatInt(2016,10) +”come”+”on”`比 fmt.Sprintf() 高效一些，但是代码很难看
+- 使用 `strings.Join()` 
+将参数组装成 `[]string`，然后调用 `strings.join`, 效率最高的一种方式，推荐使用
+
+
+```go
+strs := []string{"hello","world",strconv.FormatInt(2016,10),"come","on"}
+str = strings.Join(strs,"")
+```
+
+为什么使用 string.Join 效率最好呢, 来看下 strings.Join 的代码
+
+```go
+func Join(a []string, sep string) string {
+    //计算最终字符串的长度，根据最终长度创建[]byte,避免拼接过程中内存重新分配
+    n := len(sep) * (len(a) - 1)
+    for i := 0; i < len(a); i++ {
+        n += len(a[i])
+    }
+    b := make([]byte, n)
+    //使用copy函数是最高效的
+    bp := copy(b, a[0])
+    for _, s := range a[1:] {
+        bp += copy(b[bp:], sep)
+        bp += copy(b[bp:], s)
+    }
+    return string(b)
+}
+```
+
+但是有时候很难将参数拼接成 []string，这时我们可以使用 byte.Buffer
+
+```go
+var buffer bytes.Buffer
+for i := 0; i < 1000; i++ {
+    buffer.WriteString("a")
+}
+```
 
 ## 有关Json和结构体
 
