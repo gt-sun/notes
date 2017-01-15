@@ -255,26 +255,6 @@ func main() {
 ```
 
 
-**多缓存异步chan(提高性能)**
-
-
-```go
-//多缓存异步运算
-func main() {
-    c := make(chan int, 3)
-    for i := 0; i < 3; i++ {
-        go func(i int) {
-            c <- i * 10
-        }(i)
-    }
-
-    for i := 0; i < 3; i++ {
-        fmt.Println(<-c)
-    }
-}
-```
-
-
 
 ## 对chan使用`for-range`的场景
 
@@ -305,7 +285,7 @@ func main() {
 
 func do(ch chan int, rch chan int) {
     res := 0
-    for v := range ch { //同步chan可以使用for-range，因为取值会阻塞！
+    for v := range ch { //同步chan配合close，可以使用for-range
         res += v
     }
 
