@@ -1,6 +1,16 @@
 [TOC]
 
 
+
+## Tips
+
+- 直接打印切片
+```go
+f := []byte("dfskjdsf")
+fmt.Printf("%s", f) //不需要string(f)
+```
+
+
 ## Print
 
 `Fprint/Fprintf/Fprintln` 归为一类；第一个参数接收一个 `io.Writer` 类型，会将内容输出到 `io.Writer` 中去。

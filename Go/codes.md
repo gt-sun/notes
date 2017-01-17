@@ -93,24 +93,31 @@ func main() {
 ## golang里面的Walk
 
 ```go
-import (
-    "flag"
-    "fmt"
-    "os"
-    "path/filepath"
-)
-
-func visit(path string, f os.FileInfo, err error) error {
-    fmt.Printf("Visited: %s\n", path)
-    return nil
-}
-
 func main() {
-    flag.Parse()
-    root := flag.Arg(0)
-    err := filepath.Walk(root, visit)
-    fmt.Printf("filepath.Walk() returned %v\n", err)
+    root := "C:\\tools\\Rolan"
+    filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+        if err != nil {
+            return err
+        }
+        if info.Mode().IsRegular() {
+            fmt.Println("File:", path)
+        } else if info.Mode().IsDir() {
+            fmt.Println("Dir:", path)
+        }
+        return nil
+    })
 }
+```
+
+打印：
+```
+Dir: C:\tools\Rolan
+Dir: C:\tools\Rolan\Backup
+File: C:\tools\Rolan\Backup\Rolan_Backup_2016-12-27.rcb
+File: C:\tools\Rolan\Backup\Rolan_Backup_2016-12-28.rcb
+File: C:\tools\Rolan\Data.json
+File: C:\tools\Rolan\Rolan.cfg
+File: C:\tools\Rolan\Rolan.exe
 ```
 
 第三方库：
