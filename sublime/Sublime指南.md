@@ -5,14 +5,26 @@
 http://stackoverflow.com/questions/23045968/increase-the-font-size-of-text-in-sublime-side-bar
 
 
+## 代理
+
+打开 Preferences > Package Settings > Package Control > Settings - User 菜单
+编辑 Package Control.sublime-settings，添加两行:
+"http_proxy": "http://127.0.0.1:8123",
+"https_proxy": "http://127.0.0.1:8123"
+
 ## 快捷键
 
+Ctrl + R 跳转当前页的目标方法
+Ctrl + g 定位该行
 Ctrl + p  快速打开文件
+Crtl + Shift + f **全项目查找**
 
 Alt + Shift + 2 进行左右分屏， Alt + Shift + 8 进行上下分屏
 Alt + Shift + 1 取消分屏
 
 使用 Ctrl + N 在当前窗口创建一个新标签， Ctrl + W 关闭当前标签， Ctrl + Shift + T 恢复刚刚关闭的标签。
+
+Ctrl+PageDown 、Ctrl+PageUp 文件按开启的前后顺序切换
 
 Ctrl + Shift + L 可以将当前选中区域打散，然后进行同时编辑
 有打散自然就有合并，Ctrl + J 可以把当前选中区域合并为一行
@@ -20,6 +32,7 @@ Ctrl + Shift + L 可以将当前选中区域打散，然后进行同时编辑
 Ctrl+L 选择整行（按住 - 继续选择下行）
 
 Ctrl + Shift + ↑/↓ 移动当前行
+Ctrl + ←/→进行逐词移动，相应的，Ctrl + Shift + ←/→进行逐词选择
 
 Ctrl + Enter 在当前行下面新增一行然后跳至该行；
 Ctrl + Shift + Enter 在当前行上面增加一行并跳至该行。
@@ -27,7 +40,7 @@ Ctrl + Shift + Enter 在当前行上面增加一行并跳至该行。
 Ctrl+Shift+K(shhift+del) 删除整行， ctrl + KK 从光标处删之行尾，Ctrl+K Backspace 从光标处删除至行首
 
 Ctrl+Shift+D 复制光标所在整行，插入在该行之前
-Ctrl+D 选词 （按住 - 继续选择下个相同的字符串，再按，可跳到相应的方法定义处
+Ctrl+D 多处同步编辑
 
 ctrl + m: 匹配括号
 Ctrl+Shift+M 选择括号内的内容（按住 - 继续选择父括号）
@@ -35,7 +48,6 @@ Ctrl+Shift+M 选择括号内的内容（按住 - 继续选择父括号）
 Ctrl+/ 注释整行（如已选择内容，同 “Ctrl+Shift+/” 效果）
 Ctrl + alt + / 取消注释
 
-Ctrl + R 跳转当前页的目标方法
 
 Ctrl+K + U 大写
 Ctrl+K + L 小写
