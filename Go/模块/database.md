@@ -158,7 +158,7 @@ rows, err := db.Query("SELECT name from user")
     tx.Commit()
 ```
 
-- Columns 
+- 操作列名和数据
 
 ```go
 package main
@@ -181,33 +181,25 @@ func main() {
     rows, _ := db.Query("SELECT * from squareNum")
     columns, err := rows.Columns()
     if err != nil {
-        panic(err.Error()) // proper error handling instead of panic in your app
+        panic(err.Error())
     }
 
-    // Make a slice for the values
+    //values：一行的所有值，长度==列数
     values := make([]sql.RawBytes, len(columns))
 
-    // rows.Scan wants '[]interface{}' as an argument, so we must copy the
-    // references into such a slice
-    // See http://code.google.com/p/go-wiki/wiki/InterfaceSlice for details
     scanArgs := make([]interface{}, len(values))
     for i := range values {
         scanArgs[i] = &values[i]
     }
 
-    // Fetch rows
     for rows.Next() {
-        // get RawBytes from data
-        err = rows.Scan(scanArgs...)
+        err = rows.Scan(scanArgs...) //把每行的内容添加到scanArgs，也添加到了values
         if err != nil {
-            panic(err.Error()) // proper error handling instead of panic in your app
+            panic(err.Error())
         }
 
-        // Now do something with the data.
-        // Here we just print each column as a string.
         var value string
         for i, col := range values {
-            // Here we can check if the value is nil (NULL value)
             if col == nil {
                 value = "NULL"
             } else {
@@ -218,7 +210,7 @@ func main() {
         fmt.Println("-----------------------------------")
     }
     if err = rows.Err(); err != nil {
-        panic(err.Error()) // proper error handling instead of panic in your app
+        panic(err.Error())
     }
 }
 

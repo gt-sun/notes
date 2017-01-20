@@ -3,6 +3,14 @@
 
 ## append
 
+- 将元素添加到切片
+```go
+var b []string
+b = append(b, "S", "s")
+
+var c [][]string
+c = append(c, []string{"a"}, []string{"b"})
+```
 - 将切片 b 的元素追加到切片 a 之后：`a = append(a, b...)`
 - 删除位于索引 i 的元素：`a = append(a[:i], a[i+1:]...)`
 - 切除切片 a 中从索引 i 至 j 位置的元素：`a = append(a[:i], a[j:]...)`
