@@ -39,3 +39,79 @@ If the user specifies arguments to `docker run` then they will override the defa
 
 
 > Note: Don’t confuse `RUN` with `CMD`. `RUN` actually runs a command and commits the result; `CMD` does not execute anything at build time, but specifies the intended command for the image.
+
+
+### LABEL
+
+A few usage examples:
+
+```
+LABEL "com.example.vendor"="ACME Incorporated"
+LABEL com.example.label-with-value="foo"
+LABEL version="1.0"
+LABEL description="This text illustrates \
+that label-values can span multiple lines."
+```
+
+推荐只写一个`LABEL`！
+
+```
+LABEL multi.label1="value1" multi.label2="value2" other="value3"
+```
+
+The above can also be written as:
+
+```
+LABEL multi.label1="value1" \
+      multi.label2="value2" \
+      other="value3"
+```
+
+### ENV
+
+```
+ENV <key> <value>
+ENV <key>=<value> ...
+```
+
+For example:
+
+```
+ENV myName="John Doe" myDog=Rex\ The\ Dog \
+    myCat=fluffy
+```
+
+and
+
+```
+ENV myName John Doe
+ENV myDog Rex The Dog
+ENV myCat fluffy
+```
+
+will yield the same net results in the final image, but the first form is preferred because it produces a single cache layer.
+
+### ADD
+
+如果是压缩包，会自动解压。
+
+ADD has two forms:
+
+```
+ADD <src>... <dest>
+ADD ["<src>",... "<dest>"] (this form is required for paths containing whitespace)
+```
+
+通配符：
+
+```
+ADD hom* /mydir/        # adds all files starting with "hom"
+ADD hom?.txt /mydir/    # ? is replaced with any single character, e.g., "home.txt"
+```
+
+### COPY
+
+同上
+
+
+

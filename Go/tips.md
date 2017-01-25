@@ -13,6 +13,19 @@ http://mikespook.com/2014/07/%E5%8D%81%E6%9D%A1%E6%9C%89%E7%94%A8%E7%9A%84-go-%E
 
 
 
+## 字符串判断是否为空
+
+```go
+func main() {  
+    var x string //defaults to "" (zero value)
+    if x == "" {
+        x = "default"
+    }
+}
+```
+
+注意不能使用`nil`！
+
 ## 包管理工具对比
 
 from： http://www.grdtechs.com/2016/05/24/comparison-of-Go-Vendoring-Tools/
