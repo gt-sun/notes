@@ -16,10 +16,11 @@
 def largestRectangleArea(height):
     height.append(0)
     size = len(height)
-    no_decrease_stack = [0]  #维护一个堆栈，存放最大最大bar的位置索引
+    no_decrease_stack = [0]  #维护一个堆栈，存放最大bar的位置索引
     max_size = height[0]
     i = 0
     while i < size:
+
         cur_num = height[i]
         if (not no_decrease_stack or
                     cur_num > height[no_decrease_stack[-1]]):

@@ -25,7 +25,7 @@ type Document struct {
 
 因为 `Document` 中内嵌了一个 `Selection` 类型，因此，`Document` 可以直接使用 `Selection` 类型的方法。
 
-有五种方法获取一个 `Document` 实例，分别是从一个 URL 创建、从一个 *html.Node 创建、从一个 io.Reader 创建、从一个 *http.Response 创建和从一个已有的 Document Clone 一个。
+有五种方法获取一个 `Document` 实例，分别是从一个 URL 创建、从一个 `*html.Node` 创建、从一个 `io.Reader` 创建、从一个 `*http.Response` 创建和从一个已有的 Document Clone 一个。
 
 *Selection*
 
