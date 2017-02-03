@@ -103,26 +103,7 @@ func main() {
     err = cmd2.Wait()
     check(err)
 
-    // result := make([]byte, 1024)
-    // n, _ := outputBuf2.Read(result)
-    // fmt.Println(string(result[:n]))
-
-    var resbuf bytes.Buffer
-    for {
-        res := make([]byte, 512)
-        n, err := outputBuf2.Read(res)
-        if err != nil {
-            if err == io.EOF {
-                break
-            } else {
-                panic(err)
-            }
-        }
-        if n > 0 {
-            resbuf.Write(res[:n])
-        }
-    }
-    fmt.Println(resbuf.String())
+    fmt.Println(outputBuf2.String())
 }
 
 func check(err error) {

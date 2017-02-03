@@ -34,13 +34,6 @@ fmt.Println(resbuf.String())
 var buf bytes.Buffer
 
 func main() {
-    cmd := exec.Command("git", "version")
-    cmd.Stdout = &buf
-    err := cmd.Run()
-    if err != nil {
-        panic(err)
-    }
-    fmt.Println(buf.String())
 
     if _, ok := interface{}(&buf).(io.Writer); ok {
         println("&buf 是一个io.Writer")
@@ -55,8 +48,6 @@ func main() {
 打印：
 
 ```
-go version go1.7.3 windows/amd64
-
 &buf 是一个io.Writer
 buf 不是一个io.Writer
 ```
