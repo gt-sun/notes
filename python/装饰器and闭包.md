@@ -1,5 +1,30 @@
 [TOC]
 
+---
+
+### 应用
+
+#### `timethis`计算运行时间
+
+```py
+def timethis(func):
+    '''
+    Decorator that reports the execution time.
+    '''
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        end = time.time()
+        print(func.__name__, end-start)
+        return result
+    return wrapper
+
+@timethis
+def countdown(n):
+    while n > 0:
+        n -= 1
+```
+
 ### 闭包
 
 先不着急看闭包的定义，让我们从一段示例代码开始。

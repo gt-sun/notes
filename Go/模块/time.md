@@ -47,13 +47,7 @@ func main() {
 //2016-12-06 03:42:51.0655643 -0800 PST
 ```
 
-## 格式化
-
-- 月：01 或 Jan 都可以
-- 小时：03 表示 12 小时制，15 表示 24 小时制。
-- 时差：是 -07 ，不是 07, 后边可以增加 “00” 或 “:00”，表示更进一步的分秒时差。
-- 上下午：使用 PM，不是 AM。
-- 摆放顺序：随意，甚至重复都可以。源代码包也有定义的常用的摆放方式供使用。
+## 指定时区
 
 ```go
 func main() {
@@ -65,22 +59,43 @@ func main() {
 }
 ```
 
-## 时间初始化
+## 时间格式化
 
-时间初始化
-除了最常用的 time.Now，go 还提供了通过 unix 标准时间、字符串两种方式来初始化：
+- `Format`和`Parse`
+
+前者对Time类型直接格式化；
+后者对string类型，先转为Time类型再格式化；
+
+```go
+func f2() {
+    t := time.Now()
+    fmt.Println(t.Format("2006/01/02"))
+}
+
+func f3() {
+    // t := time.Now()
+    var value string = "2017-02-04 14:10:31"
+    res, _ := time.Parse("2006-01-02 15:04:05", value)
+    fmt.Println(res.Format("2006/01/02"))
+}
+
+打印：
+2017/02/04
+2017/02/04
+```
+
+
 
 ```
 //通过字符串，默认UTC时区初始化Time
 func Parse(layout, value string) (Time, error) 
+
 //通过字符串，指定时区来初始化Time
 func ParseInLocation(layout, value string, loc *Location) (Time, error) 
 
-//通过unix 标准时间初始化Time
-func Unix(sec int64, nsec int64) Time
 ```
 
-时间初始化的时候，一定要注意原始输入值的时区。正好手里有一个变量，洛杉矶当地时间 `“2016-11-28 19:36:25”`，unix 时间精确到秒为 `1480390585` 。将其解析出来的代码如下：
+实例代码如下：
 
 ```go
 local, _ := time.LoadLocation("America/Los_Angeles")
@@ -90,16 +105,11 @@ time1 := time.Unix(1480390585, 0)   //通过unix标准时间的秒，纳秒设�
 time2, _ := time.ParseInLocation(timeFormat, "2016-11-28 19:36:25", local)
 
 fmt.Println(time1.In(local).Format(timeFormat))
-fmt.Println(time2.In(local).Format(timeFormat))
-
-chinaLocal, _ := time.LoadLocation("Local")//运行时，该服务器必须设置为中国时区，否则最好是采用"Asia/Chongqing"之类具体的参数。
-
-fmt.Println(time2.In(chinaLocal).Format(timeFormat))
+fmt.Println(time2.Format(timeFormat))
 
 //output:
 //2016-11-28 19:36:25
 //2016-11-28 19:36:25
-//2016-11-29 11:36:25
 ```
 
 当然，如果输入值是字符串，且带有时区
@@ -279,20 +289,6 @@ func main() {
 }
 ```
 
-## time.Parse 方法
-
-```go
-func main() {
-    t, err := time.Parse(time.UnixDate, "Sat Mar  7 11:06:39 PST 2015") //默认是这种格式
-    if err != nil {
-        panic(err)
-    }
-    fmt.Println("default format:", t) //default format: 2015-03-07 11:06:39 +0000 PST
-    // 跟time.Now()格式一致
-
-    fmt.Println("Unix format:", t.Format(time.UnixDate)) //Unix format: Sat Mar  7 11:06:3
-}
-```
 
 ## 待研究代码
 
@@ -309,9 +305,11 @@ func main() {
     fmt.Println(t) // e.g. Wed Dec 21 09:52:14 +0100 RST 2011
     fmt.Printf("%02d.%02d.%4d\n", t.Day(), t.Month(), t.Year())
     // 21.12.2011
+
     t = time.Now().UTC()
     fmt.Println(t) // Wed Dec 21 08:52:14 +0000 UTC 2011
     fmt.Println(time.Now()) // Wed Dec 21 09:52:14 +0100 RST 2011
+
     // calculating times:
     week = 60 * 60 * 24 * 7 * 1e9 // must be in nanosec
     week_from_now := t.Add(week)
