@@ -1,6 +1,24 @@
+[TOC]
 
 
-先来看看几个例子。
+
+## Defer 函数调用参数的求值
+
+被defer的函数的参数会在defer声明时求值（而不是在函数实际执行时）。
+
+```
+package main
+import "fmt"
+func main() {  
+    var i int = 1
+    defer fmt.Println("result =>",func() int { return i * 2 }())
+    i++
+    //prints: result => 2 (not ok if you expected 4)
+}
+```
+
+
+## 看看几个例子
 
 例 1：
 

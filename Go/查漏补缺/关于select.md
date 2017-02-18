@@ -103,26 +103,6 @@ func main() {
 ```
 
 
-### *仅获取第一个*
-
-假设程序从多个复制的数据库同时读取。只需要一个答案，需要接收首先到达的答案，Query 函数获取数据库的连接切片并请求。并行请求每一个数据库并返回收到的第一个响应：
-
-```go
-func Query(conns []conn, query string) Result {
-    ch := make(chan Result, 1)
-    for _, conn := range conns {
-        go func(c Conn) {
-            select {
-            case ch <- c.DoQuery(query):
-            default:
-            }
-        }(conn)
-    }
-    return <- ch
-}
-```
-
-
 ### 其他
 
 select 语句实现了一种监听模式，通常用在（无限）循环中；在某种情况下，通过 break 语句使循环退出。
