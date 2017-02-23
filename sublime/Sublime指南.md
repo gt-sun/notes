@@ -17,7 +17,7 @@ http://stackoverflow.com/questions/23045968/increase-the-font-size-of-text-in-su
 Ctrl + R 跳转当前页的目标方法
 Ctrl + g 定位该行
 Ctrl + p  快速打开文件
-Crtl + Shift + f **全项目查找**
+Crtl + Shift + f **全项目查找文件**
 
 Alt + Shift + 2 进行左右分屏， Alt + Shift + 8 进行上下分屏
 Alt + Shift + 1 取消分屏

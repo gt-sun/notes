@@ -15,7 +15,7 @@ def countdown(n):
 next = countdown(10) 
 while True:
     v = next()
-    if not n: break
+    if not v: break
 ```
 
 在这段代码中，闭包用于保存内部计数器的值n，每次调用内部函数next()时，它都更新并返回这个计数器变量的前一个值。不熟悉闭包的人可能用下面这样的一个类来实现类似功能：

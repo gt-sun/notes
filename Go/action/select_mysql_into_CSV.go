@@ -1,6 +1,8 @@
 package main
 
 // 从Mysql中导出数据到CSV文件。
+//Author: sunlorr@gmail.com
+//Date: 2016-12-7
 
 import (
 	"database/sql"
