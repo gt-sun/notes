@@ -37,6 +37,17 @@ http {
     
     #默认编码
     #charset utf-8; 
+
+    #打开目录浏览
+    autoindex on;
+
+    autoindex_exact_size off;
+    #默认为 on，显示出文件的确切大小，单位是 bytes。
+    #改为 off 后，显示出文件的大概大小，单位是 kB 或者 MB 或者 GB
+
+    autoindex_localtime on;
+    #默认为 off，显示的文件时间为 GMT 时间。
+    #改为 on 后，显示的文件时间为文件的服务器时间
     
     #服务器名字的hash表大小
     #server_names_hash_bucket_size 128; 
