@@ -80,6 +80,33 @@ func main() {
 }
 ```
 
+**同步channel使用for-range**
+
+注意：必须要有close
+
+```go
+func main() {
+    var c = make(chan int)
+    var done = make(chan bool)
+
+    go func() {
+        for i := range c {
+            fmt.Println(i)
+        }
+        fmt.Println("revr done")
+        done <- true
+    }()
+
+    c <- 1
+    c <- 2
+    c <- 3
+    close(c)
+
+    <-done
+    fmt.Println("send done!")
+
+}
+```
 
 
 ## 判断channel是否关闭

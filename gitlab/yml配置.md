@@ -3,7 +3,14 @@
 *可参考：*
 
 1. https://about.gitlab.com/2016/08/11/building-an-elixir-release-into-docker-image-using-gitlab-ci-part-1/
-2. 
+2. http://docs.gitlab.com/ce/ci/yaml/README.html
+
+
+## YAML的一些规范
+
+- 使用空格代替tab
+- 任务名是任意的，通常会包含`script`字段，在`Runner`里面被执行
+- 每个任务都是独立的
 
 ## `.gitlab-ci.yml` 实例：
 
