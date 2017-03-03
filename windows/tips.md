@@ -3,9 +3,16 @@
 
 ## 工具
 
-- ShareX  截屏/录屏等
+- ShareX  截屏/录屏等，截图后一条龙上传
+- FastStone Capture 截图
+- snipaste 贴图
 - ReNamer 重命名
 - Matterwiki 小团队WIki系统
+- seer 快速预览
+- Capslock+
+- Caesium 图片压缩
+- SumatraPDF
+- QTranslate 翻译，带有文字识别  ocr API ：04ae380baa88957
 
 
 ## 快捷键
