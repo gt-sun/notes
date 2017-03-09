@@ -1038,6 +1038,8 @@ wget --spider -Y on -e "http_proxy=http://192.168.1.122:1080" "www.google.com"  
  
  
 ### curl
+
+查看本机出口IP：`curl http://members.3322.org/dyndns/getip`
  
 ```
 curl --data hello 'http://localhost:8080/main'

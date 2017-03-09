@@ -27,9 +27,18 @@
 
 http://docs.gitlab.com/ce/ci/yaml/README.html#jobs
 
+### services字段
+
+The `services` keyword defines just another docker image that is run during your job and is linked to the docker image that the `image` keyword defines. This allows you to access the service image during build time.
+
+The service image can run any application, but the most common use case is to run a database container, eg. `mysql`. It's easier and faster to use an existing image and run it as an additional container than install `mysql` every time the project is built.
+
+You can see some widely used services examples in the relevant documentation of [CI services examples](http://docs.gitlab.com/ce/ci/services/README.html).
+
+
 ## `.gitlab-ci.yml` 实例
 
-```
+```yaml
 image: maven
 before_script:
   - \cp settings.xml /usr/share/maven/conf/
@@ -49,10 +58,55 @@ staging-deploy:
     - echo ok
 ```
 
+### A sample of `.gitlab-ci.yml` for a gradle project
+
+```yaml
+image: java:8-jdk
+
+stages:
+  - build
+  - test
+  - deploy
+
+before_script:
+#  - echo `pwd` # debug
+#  - echo "$CI_BUILD_NAME, $CI_BUILD_REF_NAME $CI_BUILD_STAGE" # debug
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+build:
+  stage: build
+  script:
+    - ./gradlew assemble
+  artifacts:
+    paths:
+      - build/libs/*.jar
+    expire_in: 1 week
+  only:
+    - master
+
+test:
+  stage: test
+  script:
+    - ./gradlew check
+
+deploy:
+  stage: deploy
+  script:
+    - ./deploy
+
+after_script:
+  - echo "End CI"
+```
+
 ## `environment`配置
 
 
-```
+```yaml
 stages:
   - test
   - build
@@ -89,3 +143,5 @@ deploy_prod:
 ```
 
 设置了`when: manual`，需要在`pipelines`页面里手动启动任务。
+
+
