@@ -15,6 +15,10 @@
 - 每个任务都是独立的
 - 任务名不可以是以下名字：http://docs.gitlab.com/ce/ci/yaml/README.html#gitlab-ci-yml
 
+### variables
+
+http://docs.gitlab.com/ce/ci/variables/README.html
+
 ### stages字段
 
 1. Jobs of the same stage are run in parallel.
@@ -35,6 +39,10 @@ The service image can run any application, but the most common use case is to ru
 
 You can see some widely used services examples in the relevant documentation of [CI services examples](http://docs.gitlab.com/ce/ci/services/README.html).
 
+
+## 在build环境中使用ssh
+
+http://docs.gitlab.com/ce/ci/ssh_keys/README.html
 
 ## `.gitlab-ci.yml` 实例
 
