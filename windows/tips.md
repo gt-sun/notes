@@ -13,6 +13,7 @@
 - Caesium 图片压缩
 - SumatraPDF
 - QTranslate 翻译，带有文字识别  ocr API ：04ae380baa88957
+- clibor
 
 
 ## 快捷键
