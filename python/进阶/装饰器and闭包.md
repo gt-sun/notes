@@ -7,22 +7,30 @@
 #### `timethis`计算运行时间
 
 ```py
+import time
+
 def timethis(func):
-    '''
-    Decorator that reports the execution time.
-    '''
-    def wrapper(*args, **kwargs):
+    def wraper(*args,**kwargs):
         start = time.time()
-        result = func(*args, **kwargs)
+        res = func(*args,**kwargs)
         end = time.time()
-        print(func.__name__, end-start)
-        return result
-    return wrapper
+        print(func.__name__,end-start)
+        return res
+    return wraper
 
 @timethis
-def countdown(n):
+def test(n):
     while n > 0:
         n -= 1
+    return "Done!"
+
+
+t = test(1000000)
+print(t)
+
+# print
+test 0.07812929153442383
+Done!
 ```
 
 ### 闭包
@@ -121,77 +129,86 @@ Coord: {'y': 400, 'x': 400}
 
 
 ```py
-class C(object):
-    def __init__(self, x, y):
+class Coordinate(object):
+    def __init__(self,x,y):
         self.x = x
         self.y = y
     def __repr__(self):
-        return "坐标是：" + str(self.__dict__)
+        return "Coordiname:" + str(self.__dict__)
 
 
-def zz(func):
-    def checker(x,y):
-        if x.x < 0 or y.x < 0:
-            print("不能小于0")
-            return
-        return func(x,y)
-    return checker
+def lessfive(func):
+    def wraper(*args,**kwargs):
+        for i in args:
+            if i.x > 5:
+                i.x = 5
+            if i.y > 5:
+                i.y = 5
+        res = func(*args,**kwargs)
+        return res
+    return wraper
 
+@lessfive
+def add(m,n):
+    return Coordinate(m.x + n.x, m.y + n.y)
 
-@zz
-def add(a,b):
-    return C(a.x + b.x, b.y + a.y)
+a = Coordinate(10,20)
+b = Coordinate(1,2)
 
-c = C(100,200)
-d = C(1, 10)
-print(add(d,c))
+c = add(a,b)
+print(c)
+
+# out
+Coordiname:{'x': 6, 'y': 7}
 ```
 
-*更通用的装饰器*
-
-```py
->>> def logger(func):
-...     def inner(*args, **kwargs): #1
-...         print "Arguments were: %s, %s" % (args, kwargs)
-...         return func(*args, **kwargs) #2
-...     return inner
-```
 
 ###　带参数的装饰器
 
+再包装一层函数
+
 ```py
-def logging(level):
-    def wrapper(func):
-        def inner_wrapper(*args, **kwargs):
-            print "[{level}]: enter function {func}()".format(
-                level=level,
-                func=func.__name__)
-            return func(*args, **kwargs)
-        return inner_wrapper
-    return wrapper
+class Coordinate(object):
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
+    def __repr__(self):
+        return "Coordiname:" + str(self.__dict__)
 
-@logging(level='INFO')
-def say(something):
-    print "say {}!".format(something)
 
-# 如果没有使用@语法，等同于
-# say = logging(level='INFO')(say)
+def lessfive(mes):
+    def build(func):
+        def wraper(*args,**kwargs):
+            print(mes)
+            for i in args:
+                if i.x > 5:
+                    i.x = 5
+                if i.y > 5:
+                    i.y = 5
+            res = func(*args,**kwargs)
+            return res
+        return wraper
+    return build
 
-@logging(level='DEBUG')
-def do(something):
-    print "do {}...".format(something)
+@lessfive(mes="小于5")
+def add(m,n):
+    return Coordinate(m.x + n.x, m.y + n.y)
 
-if __name__ == '__main__':
-    say('hello')
-    do("my work")
+a = Coordinate(10,20)
+b = Coordinate(1,2)
+
+c = add(a,b)
+print(c)
+
+# out
+小于5
+Coordiname:{'y': 7, 'x': 6}
 ```
-
-你可以这么理解，当带参数的装饰器被打在某个函数上时，比如`@logging(level='DEBUG')`，它其实是一个函数，会马上被执行，只要这个它返回的结果是一个装饰器时，那就没问题。
 
 
 ### 内置装饰器 
 
-- @property
+- @property   负责把一个方法变成属性调用
 
 实例：
 
@@ -359,4 +376,33 @@ print len(table), table[3]  # 5 9
 
 ###  使用 `@functools.wraps(func) `
 
+保留原有函数的名称和 docstring
+
 https://segmentfault.com/a/1190000006658289
+
+
+```py
+
+from functools import wraps
+
+
+def addstr(func):
+    @wraps(func)
+    def wraper():
+        print("this is addstr()")
+        res = func()
+        return res
+    return wraper
+
+
+@addstr
+def test():
+    print("this is test()") 
+
+test()
+print(test.__name__) #test
+
+
+#如果不用functools.wraps，这里的__name__是wraper
+
+```
