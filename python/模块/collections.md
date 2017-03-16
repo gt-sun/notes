@@ -213,26 +213,13 @@ print(d)  #{"hardold": {"age": 20, "username": "hrldcpr", "country": {"china": {
 ```
 
 
-### deque - 固定长度队列
+### deque - 高效插入和删除操作
+
+`collections.deque([iterable[, maxlen]])`
 
 
 > As a general rule, if you need fast appends or fast pops, use a deque. If you need fast random access, use a list.
 
-
-```py
-from collections import deque 
- 
-def get_last(filename, n=5):
-    """
-    Returns the last n lines from the file
-    """
-    try:
-        with open(filename) as f:
-            return deque(f, n)
-    except OSError:
-        print("Error opening file: {}".format(filename))
-        raise
-```
 
 *廖雪峰*
 
@@ -253,6 +240,25 @@ deque(['y', 'a', 'b', 'c', 'x'])
 
 *PythonCookbook*
 
+
+**返回文件的最后n行**
+
+```py
+from collections import deque 
+ 
+def get_last(filename, n=5):
+    """
+    Returns the last n lines from the file
+    """
+    try:
+        with open(filename) as f:
+            return deque(f, n)
+    except OSError:
+        print("Error opening file: {}".format(filename))
+        raise
+```
+
+
 **保留目标行的前5行**
 
 保留有限历史记录正是 `collections.deque` 大显身手的时候。比如，下面的代码在多行上面做简单的文本匹配， 并只返回在前N行中匹配成功的行：
@@ -269,12 +275,12 @@ def search(lines, pattern, history=5):
 
 # Example use on a file
 if __name__ == '__main__':
-with open(r'../../cookbook/somefile.txt') as f:
-for line, prevlines in search(f, 'python', 5):
-    for pline in prevlines:
-        print(pline, end='')
-    print(line, end='')
-    print('-' * 20)
+    with open(r'../../cookbook/somefile.txt') as f:
+        for line, prevlines in search(f, 'python', 5):
+            for pline in prevlines:
+                print(pline, end='')
+            print(line, end='')
+        print('-' * 20)
 ```
 
 **讨论**
@@ -357,7 +363,7 @@ Counter是一个简单的计数器，例如，统计字符出现的个数：
 >>> from collections import Counter
 >>> c = Counter()
 >>> for ch in 'programming':
-...     c[ch] = c[ch] + 1
+...     c[ch] = c[ch] + 1  # c[ch] 默认为零
 ...
 >>> c
 Counter({'g': 2, 'm': 2, 'r': 2, 'a': 1, 'i': 1, 'o': 1, 'n': 1, 'p': 1})
@@ -573,38 +579,6 @@ ChainMap
 42
 ```
 
-- 实例
-
-```py
-import os
-import argparse
-from collections import ChainMap
-
-def main():
-  app_defaults = {'username': 'admin', 'passwd':'admin'}
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-u', '--username')
-    parser.add_argument('-p', '--passwd')
-    args = parser.parse_args()
-    command_line_arguments = {key:value for key, value in vars(args).items() if value}
-
-    chain = ChainMap(command_line_arguments, os.environ, app_defaults)
-    print(chain['username'])
-
-if __name__=='__main__':
-  main()
-    os.environ['username'] = 'su'
-  main()
-
-#python test.py
-# sun
-# su
-# 
-#python test.py -u aaaa
-# aaaa
-# aaaa
-```
 
 ### Iterable - 判断一个对象是否可迭代
 
@@ -623,11 +597,11 @@ if __name__=='__main__':
 from collections import Iterable
 
 def flatten(items, ignore_types=(str, bytes)):
-for x in items:
-    if isinstance(x, Iterable) and not isinstance(x, ignore_types):
-        yield from flatten(x)
-    else:
-        yield x
+    for x in items:
+        if isinstance(x, Iterable) and not isinstance(x, ignore_types):
+            yield from flatten(x)
+        else:
+            yield x
 
 
 items = [1, 2, [3, 4, [5, 6], 7], 8]
@@ -671,6 +645,3 @@ def flatten(items, ignore_types=(str, bytes)):
 
 
 之前提到的对于字符串和字节的额外检查是为了防止将它们再展开成单个字符。 如果还有其他你不想展开的类型，修改参数 `ignore_types` 即可。
-
-
-最后要注意的一点是， `yield from `在涉及到基于协程和生成器的并发编程中扮演着更加重要的角色。 
