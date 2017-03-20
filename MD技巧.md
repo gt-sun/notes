@@ -23,3 +23,11 @@ $\sqrt{2} \quad and \quad \sqrt[n]{3}$
 ## 输入省略号
 
 数学公式中常见的省略号有两种，`\ldots` 表示与文本底线对齐的省略号，`\cdots` 表示与文本中线对齐的省略号。
+
+
+## Markdown 的跳转功能实现：
+
+```
+定义一个锚 (id)：<span id="jump">跳转到的地方</span>
+使用 markdown 语法：[点击跳转](#jump)
+```
