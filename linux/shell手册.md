@@ -1150,6 +1150,12 @@ ssh -p10022 sun@192.168.8.211 "/sbin/ip a"
 ssh -p10022 -t hero@114.55.39.156 sudo /sun/shell/de.sh
 ```
 
+### openssl
+
+自签名证书：
+
+见`nginx/配置说明2.md`
+
 ### sshpass
 
 安装

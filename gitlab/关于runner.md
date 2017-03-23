@@ -1,9 +1,16 @@
 
+toml里面可写的内容
+
 
 *链接*
 http://docs.gitlab.com/ce/ci/runners/README.html
 https://docs.gitlab.com/runner/
 http://docs.gitlab.com/ce/ci/docker/README.html
+[GitLab Runner Commands](https://docs.gitlab.com/runner/commands/README.html)
+[关于 Runner 的 Executors](https://docs.gitlab.com/runner/executors/README.html)
+[使用docker作为Executor](https://docs.gitlab.com/runner/executors/docker.html)
+
+
 
 - GitLab and the Runners communicate through an API, so the only requirement is that the Runner's machine has Internet access.
 - Runners run your yaml.
@@ -14,6 +21,9 @@ http://docs.gitlab.com/ce/ci/docker/README.html
 - Specific Runners do not get shared with forked projects automatically.
 - Whenever a project is forked, it copies the settings of the jobs that relate to it. This means that if you have shared Runners setup for a project and someone forks that project, the shared Runners will also serve jobs of this project.
 - If you are an admin on your GitLab instance, you can make any shared Runner a specific Runner, but you can not make a specific Runner a shared Runner.
+- You can configure a Runner to assign it exclusively to a project. When a Runner is locked this way, it can no longer be enabled for other projects. This setting is available on each Runner in *Project Settings > Runners*.
+- []默认config文件在`/etc/gitlab-runner/config.toml(root)`，你可以指定不同的toml文件来使用不同的配置。
+- gitlab-runner 通过yum安装之后，默认会注册为systemd的一个service，通过`systemctl status gitlab-runner`查看。
 
 
 ### Register docker runner 
