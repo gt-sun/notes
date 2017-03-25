@@ -27,6 +27,82 @@ http://docs.gitlab.com/ce/ci/variables/README.html
 4. If a job doesn't specify a `stage`, the job is assigned the `test` stage.
 
 
+### cache
+
+`cache` is used to specify a list of files and directories which should be
+cached between jobs. You can only use paths that are within the project
+workspace.
+
+> only `/builds` and `/cache` is transferred you have no-way to cache container-local files.
+You need to relocate your container-local directory (like: `/root/.cabal`, `/root/.gradle`) to `/cache`. If you put that in /cache you don't need to use the `cache` in `.gitlab-ci.yml` directive then, since this is already preserved between builds.
+
+
+Cache all Git untracked files:
+（比如本次构建新生成了一些文件在项目中，那么下一次git拉取项目的时候不会删除这些文件）
+
+```yml
+rspec:
+  script: test
+  cache:
+    untracked: true
+```
+
+
+
+
+`cache` is not:
+Caching is not designed to pass artifacts between stages.Cache is for runtime dependencies needed to compile the project
+
+
+### artifacts
+
+
+一个实例用法：
+
+```yml
+build:
+  type: build
+  script:
+  - make binaries
+  artifacts:
+    paths:
+    - my/binaries
+
+test:
+  type: test
+  script:
+  - my/binaries do-something
+```
+
+**artifacts 和 cache 区别**
+
+- cache 'node_modules' for the NEXT run (triggered by a commit to the repo) so that they don't have to be installed again (unless the cache gets deleted)
+- create an artifact containing 'node_modules' and 'build' in 'job_build', so that 'job_test' in THIS run can use those files
+
+```yml
+job_build:
+  stage: build
+  script:
+    - npm install
+  cache:
+    key: ${CI_BUILD_REF_NAME}
+    paths:
+      - node_modules/
+  artifacts:
+    paths:
+     - node_modules/
+     - build/
+
+job_test:
+  stage: test
+  script:
+    - gulp test:unit
+```
+
+artifacts是为下一个job用的；
+cache是为下一次构建用的；
+
+
 ### jobs
 
 http://docs.gitlab.com/ce/ci/yaml/README.html#jobs

@@ -49,3 +49,92 @@ By default the executor will only pull images from Docker Hub, but this can be c
 ### using_docker_build(3种方式)
 
 http://docs.gitlab.com/ce/ci/docker/using_docker_build.html
+
+- shell方式
+
+项目在runner所在的机器上运行，比如构建java项目的话，机器上需安装mvn/gradle环境。
+
+```sh
+gitlab-ci-multi-runner register -n \
+  --url https://gitlab.com/ci \
+  --registration-token REGISTRATION_TOKEN \
+  --executor shell \
+  --description "My Runner"
+```
+
+
+- docker-in-docker方式
+
+有3个问题：
+    1. 使用了`--docker-privileged`的权限安全；
+    2. When using docker-in-docker, each job is in a clean environment without the past history. Concurrent jobs work fine because every build gets it's own instance of Docker engine so they won't conflict with each other. But this also means jobs can be slower because there's no caching of layers.（无法使用本地的image，每个job都是一个新的容器，必须要每次都去拉取image）
+    3. By default, docker:dind uses --storage-driver vfs which is the slowest form offered. 
+
+要以如下指令注册runner：
+
+```sh
+gitlab-ci-multi-runner register -n \
+  --url https://git.bvaccc.top/ci \
+  --registration-token zkw4X-xNZeK1zpDuuMkX \
+  --executor docker \
+  --description "My Docker Runner" \
+  --docker-image "docker:17" \
+  --docker-privileged
+```
+
+实例`.gitlab-ci.yml`配置如下：
+
+```yml
+image: docker:17
+
+services:
+- docker:dind
+
+before_script:
+  - docker info
+
+build_image:
+  script:
+  - cat README.md
+  - hostname
+```
+
+
+- 绑定本地的docker socket
+
+注册如下runner：
+
+```sh
+sudo gitlab-ci-multi-runner register -n \
+  --url https://gitlab.com/ci \
+  --registration-token REGISTRATION_TOKEN \
+  --executor docker \
+  --description "My Docker Runner" \
+  --docker-image "docker:latest" \
+  --docker-volumes /var/run/docker.sock:/var/run/docker.sock
+```
+
+实例：
+
+```yml
+image: docker:latest
+
+before_script:
+- docker info
+
+build:
+  stage: build
+  script:
+  - docker build -t my-docker-image .
+  - docker run my-docker-image /script/to/run/tests
+```
+
+存在3个不足：
+
+1. By sharing the docker daemon, you are effectively disabling all the security mechanisms of containers and exposing your host to privilege escalation which can lead to container breakout. For example, if a project ran docker rm -f $(docker ps -a -q) it would remove the GitLab Runner containers.
+1. Concurrent jobs may not work; if your tests create containers with specific names, they may conflict with each other.
+1. Sharing files and directories from the source repo into containers may not work as expected since volume mounting is done in the context of the host machine, not the build container, e.g.:
+```sh
+docker run --rm -t -i -v $(pwd)/src:/home/app/src test-image:latest run_app_tests
+```
+
