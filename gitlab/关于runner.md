@@ -9,8 +9,9 @@ http://docs.gitlab.com/ce/ci/docker/README.html
 [GitLab Runner Commands](https://docs.gitlab.com/runner/commands/README.html)
 [关于 Runner 的 Executors](https://docs.gitlab.com/runner/executors/README.html)
 [使用docker作为Executor](https://docs.gitlab.com/runner/executors/docker.html)
+[gitlab-ci-multi-runner](https://gitlab.com/gitlab-org/gitlab-ci-multi-runner/tree/master/docs)
 
-
+[config.toml配置](https://docs.gitlab.com/runner/configuration/advanced-configuration.html)
 
 - GitLab and the Runners communicate through an API, so the only requirement is that the Runner's machine has Internet access.
 - Runners run your yaml.
