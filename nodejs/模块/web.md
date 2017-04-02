@@ -2,10 +2,60 @@
 
 ## url解析
 
-*获取请求的path*
+*解析字符串*
 
-`var pathname = url.parse(request.url).pathname;`
+```js
+const url = require('url')
+const u = 'http://www.qq.com/foo/bar/?name=sun'
 
+var urlParse = url.parse(u)
+
+console.log(urlParse.protocol)
+console.log(urlParse.hostname)
+console.log(urlParse.pathname)
+console.log(urlParse.search)
+console.log(urlParse.query)
+
+/*
+http:
+www.qq.com
+/foo/bar/
+?name=sun
+name=sun
+*/
+```
+
+
+*使用class:URL*
+
+```js
+const URL = require('url').URL;
+const myURL = new URL('https://example.org/?abc=123');
+console.log(myURL.searchParams.get('abc'));
+  // Prints 123
+
+myURL.searchParams.append('abc', 'xyz');
+console.log(myURL.href);
+  // Prints https://example.org/?abc=123&abc=xyz
+
+myURL.searchParams.delete('abc');
+myURL.searchParams.set('a', 'b');
+console.log(myURL.href);
+  // Prints https://example.org/?a=b
+```
+
+*urlSearchParams.forEach(fn[, thisArg])*
+
+```js
+const URL = require('url').URL;
+const myURL = new URL('https://example.org/?a=b&c=d');
+myURL.searchParams.forEach((value, name, searchParams) => {
+  console.log(name, value, myURL.searchParams === searchParams);
+});
+  // Prints:
+  // a b true
+  // c d true
+```
 
 ## POST请求
 

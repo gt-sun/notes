@@ -74,6 +74,26 @@ d.speak() //baidu barks.
 d.speakagain() //baidu again!
 
 //如果子类中存在构造函数，则需要在使用 “this” 之前首先调用 super()
+// 实例 
+const EventEmitter = require('events')
+
+class MyStream extends EventEmitter {
+  constructor() {
+    super()
+  }
+
+  write(data) {
+    this.emit('data', data)
+  }
+}
+
+const stream = new MyStream()
+
+stream.on('data', (data) => {
+  console.log(`received data: ${data}`)
+})
+
+stream.write('With ES6')
 
 //也可以扩展基于函数的类，如下：
 function Animal (name) {
@@ -97,6 +117,7 @@ d.speak();
 //Mitzie makes a noise.
 Mitzie barks.
 */
+
 
 
 //使用super方法
