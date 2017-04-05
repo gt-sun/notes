@@ -2,6 +2,9 @@ https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects
 
 Promise 对象用于异步技术中。Promise 意味着一个还没有完成的操作（许愿），但在未来会完成的（实现）。
 
+
+为了避免上述中同时使用同步、异步调用可能引起的混乱问题，Promise 在规范上规定 Promise **只能使用异步调用方式** 。由于 Promise 保证了每次调用都是以异步方式进行的，所以我们在实际编码中不需要调用 `setTimeout` 来自己实现异步调用。
+
 ```js
 var myFirstPromise = new Promise(function(resolve, reject){
     //当异步代码执行成功时，我们才会调用resolve(...), 当异步代码失败时就会调用reject(...)
@@ -20,6 +23,80 @@ myFirstPromise.then(function(successMessage){
 
 
 
+
+## Promise迷你书
+
+http://liubin.org/promises-book/
+
+*then catch*
+
+其实 `.catch`只是 `promise.then(undefined, onRejected)` 的别名而已。一般说来，使用`.catch`来将 resolve 和 reject 处理分开来写是比较推荐的做法。
+使用`promise.then(onFulfilled, onRejected)` 的话
+
+在 onFulfilled 中发生异常的话，在 onRejected 中是捕获不到这个异常的。
+
+在 `promise.then(onFulfilled).catch(onRejected)` 的情况下
+
+then 中产生的异常能在 `.catch` 中捕获
+
+.then 和 .catch 在本质上是没有区别的
+
+需要分场合使用。
+
+---
+
+静态方法 `Promise.resolve(value)` 可以认为是 `new Promise()` 方法的快捷方式。
+
+比如 `Promise.resolve(42);` 可以认为是以下代码的语法糖。
+
+```js
+new Promise(function(resolve){
+    resolve(42);
+});
+```
+
+方法 `Promise.resolve(value);` 的返回值也是一个 promise 对象，所以我们可以像下面那样接着对其返回值进行 `.then` 调用。
+
+```js
+Promise.resolve(42).then(function(value){
+    console.log(value);
+});
+```
+
+*链式操作*
+
+```js
+function increment(value) {
+  return value + 1
+}
+
+function double(value) {
+  return value * 2
+}
+
+function output(value) {
+  console.log(value)
+}
+
+
+var promise = Promise.resolve(1)
+promise.then(increment).then(double).then(output) //4
+```
+
+---
+
+*Promise.all*
+
+`Promise.all` 接收一个 promise 对象的数组作为参数，当这个数组里的所有 promise 对象全部变为 resolve 或 reject 状态的时候，它才会去调用 `.then` 方法。
+
+传递给 `Promise.all` 的 promise 并不是一个个的顺序执行的，而是同时开始、并行执行的。而且每个 promise 的结果（resolve 或 reject 时传递的参数值），和传递给 `Promise.all` 的 promise 数组的顺序是一致的。
+
+
+*Promise.race*
+
+`Promise.race` 只要有一个 promise 对象进入 FulFilled 或者 Rejected 状态的话，就会继续进行后面的处理。
+
+`Promise.race` 在第一个 promise 对象变为 Fulfilled 之后，并不会取消其他 promise 对象的执行。
 
 ## asynchronous-flow-control
 

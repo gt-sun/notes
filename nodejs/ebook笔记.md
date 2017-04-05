@@ -1,5 +1,15 @@
 
 
+
+
+
+
+## 用 Async 函数简化异步代码
+
+https://www.oschina.net/translate/simplifying-asynchronous-coding-es7-async-functions
+
+> Promise 是迭代器 / 生成器的一个应用，map () 不适用于 async await 以及 Promise，for () 是专用于迭代器，也适用于 Promise. for (var promise of promises) { await promise() }
+
 ## asynchronous-flow-control
 
 promise部分请看promise.md.
