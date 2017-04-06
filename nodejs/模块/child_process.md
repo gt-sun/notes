@@ -31,6 +31,7 @@ For convenience, the `child_process` module provides a handful of synchronous an
 
 ## 详细
 
+
 ### `child_process.exec(command[, options][, callback])`
 
 
