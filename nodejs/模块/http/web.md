@@ -61,6 +61,36 @@ myURL.searchParams.forEach((value, name, searchParams) => {
 
 ### http.get()
 
+> get()不需要调用end()，会自动处理。
+
+*twitter 搜索CLI*
+
+```js
+var https = require('https')
+var qs = require('querystring')
+
+var search = process.argv.slice(2).join(' ').trim()
+if (!search.length){
+  return console.log('\r\nUsage: node tweets <search term>')
+}
+
+console.log('Searching for : ' + search)
+
+https.get({
+  host:'api.twitter.com'
+  ,path:'/1.1/search/tweets.json?' + qs.stringify({q:search})
+},function (res) {
+   var body = ''
+   res.on('data',function(chunk){
+    body += chunk
+   })
+   res.on('end',function(){
+    var obj = JSON.parse(body)
+    console.log(obj)
+   })
+})
+```
+
 *解析返回的JSON数据*
 
 ```js
@@ -252,4 +282,19 @@ POST
   'content-type': 'application/x-www-form-urlencoded' }
 Hello World
 */
+```
+
+### 显示图片
+
+```js
+var http = require('http')
+var fs = require('fs')
+
+var server = http.createServer(function(req,res){
+  res.writeHead(200,{'Content-Type':'image/png'})
+  stream = fs.createReadStream('01.png').pipe(res)
+  
+})
+
+server.listen(3000)
 ```

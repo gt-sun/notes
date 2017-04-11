@@ -94,7 +94,7 @@ https://github.com/dead-horse/node-style-guide/blob/master/Readme.md
 
 * 文件命名
 
-    单词之间使用 ‘_’ underscore 来 分割，如果你不想暴露某个文件给用户 ，
+    单词之间使用 ‘_’ underscore 来分割，如果你不想暴露某个文件给用户 ，
     你也可以用‘_’ 来开头
    
     Right :

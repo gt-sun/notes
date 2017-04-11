@@ -62,8 +62,6 @@ var readStream = fs.createReadStream('c2.js');
 
 readStream.pipe(writeStream);
 
-console.log('Begin');
-
 
 // ==================链式流-压缩===================
 var fs = require('fs');
@@ -71,15 +69,12 @@ var zlib = require('zlib');
 
 fs.createReadStream('t').pipe(zlib.createGzip()).pipe(fs.createWriteStream('t.gz'));
 
-console.log('Begin');
 
 // =================链式流-解压==================
 var fs = require('fs');
 var zlib = require('zlib');
 
 fs.createReadStream('t.gz').pipe(zlib.createGunzip()).pipe(fs.createWriteStream('t2'));
-
-console.log('Begin');
 
 
 
