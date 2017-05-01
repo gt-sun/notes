@@ -16,6 +16,97 @@ undefined
 
 # 标准库
 
+## 原型
+
+[[Prototype]] 引用有什么用呢？当你试图引用对象的属性时会触发[[Get]] 操作，比如 `myObject.a` 。对于默认的 [[Get]] 操作来说，第一步是检查对象本身是否有这个属性，如果有的话就使用它。
+但是如果 a 不在 myObject 中，就需要使用对象的 [[Prototype]] 链了。
+
+```js
+var anotherObject = {
+    a:2
+};
+// 创建一个关联到 anotherObject 的对象
+var myObject = Object.create( anotherObject );
+myObject.a; // 2
+```
+
+>  Object.create(..) 的原理，现在只需要知道它会创建一个对象并把这个对象的 [[Prototype]] 关联到指定的对象。
+
+思考下面的代码：
+
+```js
+var anotherObj = {
+    a:2
+}
+
+var myObj = Object.create(anotherObj)
+
+console.log(anotherObj.a)
+console.log(myObj.a)
+
+console.log(anotherObj.hasOwnProperty('a')) //true
+console.log(myObj.hasOwnProperty('a')) //false
+
+myObj.a++
+
+console.log(anotherObj.a) //2
+console.log(myObj.a) //3
+```
+
+尽管 `myObject.a++` 看起来应该（通过委托）查找并增加 `anotherObject.a `属性，但是别忘
+了 `++` 操作相当于 `myObject.a = myObject.a + 1` 。因此 `++` 操作首先会通过 [[Prototype]]
+查找属性 `a` 并从 `anotherObject.a` 获取当前属性值 2，然后给这个值加 1，接着用 [[Put]]
+将值 3 赋给 myObject 中新建的屏蔽属性 `a` ，天呐！
+修改委托属性时一定要小心。如果想让 `anotherObject.a` 的值增加，唯一的办法是
+`anotherObject.a++` 。
+
+
+*继承*意味着复制操作，JavaScript（默认）并不会复制对象属性。相反，JavaScript 会在两个对象之间创建一个关联，这样一个对象就可以通过委托访问另一个对象的属性和函数。*委托*这个术语可以更加准确地描述 JavaScript 中对象的关联机制。
+
+
+首先，你可能会认为 ES6 的 class 语法是向 JavaScript 中引入了一种新的“类”机制，其实不是这样。 class 基本上只是现有 [[Prototype]] （委托！）机制的一种语法糖。
+也就是说， class 并不会像传统面向类的语言一样在声明时静态复制所有行为。如果你
+（有意或无意）修改或者替换了父“类”中的一个方法，那子“类”和所有实例都会受到
+影响，因为它们在定义时并没有进行复制，只是使用基于 [[Prototype]] 的实时委托。
+例子：
+
+```js
+class C{
+    constructor(){
+        this.num = Math.random()
+    }
+
+    rand(){
+        console.log("Random: " + this.num)
+    }
+}
+
+var c1 = new C()
+c1.rand() //Random: 0.4566235787611743
+
+C.prototype.rand = function(){
+    console.log("Random: " + Math.round(this.num * 1000))
+}
+
+var c2 = new C()
+c2.rand() //Random: 11
+c1.rand() //Random: 457  也扩大了1000倍
+```
+
+
+
+
+
+## 对象
+
+原始值 "I am a string" 并不是一个对象，它只是一个字面量，并且是一个不可变的值。
+如果要在这个字面量上执行一些操作，比如获取长度、访问其中某个字符等，那需要将其
+转换为 String 对象。
+幸好，在必要时语言会自动把字符串字面量转换成一个 String 对象，也就是说你并不需要显式创建一个对象。
+
+
+对于 Object 、 Array 、 Function 和 RegExp （正则表达式）来说，无论使用文字形式还是构造形式，它们都是对象，不是字面量。
+
 ## JSON
 
 
