@@ -33,6 +33,29 @@ http://docs.gitlab.com/ce/ci/variables/README.html
 cached between jobs. You can only use paths that are within the project
 workspace.
 
+
+举例：
+
+```yaml
+stages:
+  - test
+  - deploy
+
+cache:
+  paths:
+  - ./data
+
+test:
+  stage: test
+  script: mkdir -p ./data && echo 123 > ./data/test.log
+
+deploy_staging:
+  stage: deploy
+  script:
+    - cat ./data/test.log
+```
+
+
 > only `/builds` and `/cache` is transferred you have no-way to cache container-local files.
 You need to relocate your container-local directory (like: `/root/.cabal`, `/root/.gradle`) to `/cache`. If you put that in /cache you don't need to use the `cache` in `.gitlab-ci.yml` directive then, since this is already preserved between builds.
 
