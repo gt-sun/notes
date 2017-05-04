@@ -1,5 +1,35 @@
 [TOC]
 
+
+## 2重循环 -> 1重循环
+
+需求如下：
+
+```py
+s = "a string to examine"
+for i in range(len(s)):
+    for j in range(i+1, len(s)):
+        if s[i] == s[j]:
+            answer = (i, j)
+            break   # 如何 break 两次呢???
+```
+
+对索引对进行一重循环:
+
+```py
+def unique_pairs(n):
+    """在 range(n) 范围内生成索引对"""
+    for i in range(n):
+        for j in range(i+1, n):
+            yield i, j
+
+s = "a string to examine"
+for i, j in unique_pairs(len(s)):
+    if s[i] == s[j]:
+        answer = (i, j)
+        break
+```
+
 ## 安全的使用eval
 
 ```py

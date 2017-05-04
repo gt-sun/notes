@@ -15,6 +15,44 @@
 - 每个任务都是独立的
 - 任务名不可以是以下名字：http://docs.gitlab.com/ce/ci/yaml/README.html#gitlab-ci-yml
 
+
+
+### yaml瞄点的使用
+
+`&`用来建立锚点（defaults），`<<`表示合并到当前数据，`*`用来引用锚点。
+
+```yaml
+stages:
+  - test
+  
+.select-runner: &select-runner
+  tags:
+  - one
+
+test:
+  stage: test
+  script:
+  - echo 123~~
+  <<: *select-runner
+```
+
+另一个用法：
+
+```yaml
+- &showell Steve 
+- Clark 
+- Brian 
+- Oren 
+- *showell
+```
+
+转为 JavaScript 代码如下：
+
+```
+[ 'Steve', 'Clark', 'Brian', 'Oren', 'Steve' ]
+```
+
+
 ### variables
 
 http://docs.gitlab.com/ce/ci/variables/README.html
