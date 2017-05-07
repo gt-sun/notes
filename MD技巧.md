@@ -2,6 +2,16 @@
 
 链接：https://www.zybuluo.com/codeep/note/163962
 
+
+## 链接
+
+[百度](https://www.baidu.com)
+
+
+## 图片
+
+![](https://www.zybuluo.com/static/img/my_head.jpg)
+
 ## 上角 下角
 
 $n^2$
