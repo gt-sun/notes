@@ -53,6 +53,11 @@ test:
 ```
 
 
+
+### before_script
+
+注意一点：如果tags不同，会在每个tags上面运行一遍！
+
 ### variables
 
 http://docs.gitlab.com/ce/ci/variables/README.html
