@@ -151,5 +151,21 @@ Golang 的双引号和反引号都可用于表示一个常量字符串，不同�
 
 `%v`：默认格式
 
+*打印struct：*
+
+```go
+type Q struct {
+    A int
+    B int
+}
+
+func main() {
+    var jj = new(Q)
+    jj.A = 123
+    jj.B = 456
+
+    fmt.Printf("%+v\n", jj)
+}
+```
 
 

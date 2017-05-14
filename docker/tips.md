@@ -16,5 +16,5 @@ docker daemon会检查`/etc/ssl/certs`目录下的证书文件，如果之前有
 ```
 vim /usr/lib/systemd/system/docker.service
 
-ExecStart=/usr/bin/docker daemon -H fd:// --registry-mirror=https://kodfz8hg.mirror.aliyuncs.com
+ExecStart=/usr/bin/docker daemon -H fd:// --registry-mirror=https://4zyph00m.mirror.aliyuncs.com
 ```
