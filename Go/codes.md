@@ -1,5 +1,31 @@
 [TOC]
 
+
+## 闭包的一些实例
+
+- 1
+
+```go
+func main() {
+
+    addBMP := theFunc("BMP")
+    addPNG := theFunc("PNG")
+
+    r1 := addBMP("file.BMP")
+    r2 := addPNG("file")
+    fmt.Println(r1, r2)
+}
+
+func theFunc(s string) func(string) string {
+    return func(name string) string {
+        if !strings.HasSuffix(name, s) {
+            return name + "." + s
+        }
+        return name
+    }
+}
+```
+
 ## 拼接字符串
 
 字符串的拼接大概有以下几种方式
