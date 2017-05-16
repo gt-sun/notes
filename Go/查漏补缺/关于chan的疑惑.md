@@ -390,29 +390,31 @@ func Go(c chan bool, index int) {
 来循环：
 
 ```go
+package main
+
+import "fmt"
+
 func main() {
-    runtime.GOMAXPROCS(runtime.NumCPU())
-    cs := make([]chan bool, 10)
-    for i := 0; i < 10; i++ {
-        cs[i] = make(chan bool, 1)
-        go Go(cs[i], i)
+    chanSlice := make([]chan int, 10)
+
+    for i := 0; i < len(chanSlice); i++ {
+        chanSlice[i] = make(chan int, 1)
+        go foo(chanSlice[i])
     }
 
-    for _, c := range cs {
-        <-c
+    for i, value := range chanSlice {
+        fmt.Println(i, " : ", <-value)
     }
+    fmt.Println("Done~~")
 }
 
-func Go(c chan bool, index int) {
-    a := 0
-    for i := 0; i < 10000000; i++ {
-        a += i
+func foo(c chan int) {
+    tmp := 0
+    for u := 0; u < 1000000; u++ {
+        tmp += u
     }
-    fmt.Println(index, a)
-
-    c <- true
+    c <- tmp
 }
-
 ```
 
 缓存异步chan不能使用`for-range`，因为需要配合close使用，但基本上异步chan没法去close，因为是为了开启它提高性能才使用异步goroutine的，又要关闭它岂不是笑话？！
