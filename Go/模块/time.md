@@ -2,6 +2,7 @@
 
 ---
 
+
 ## Time 和 int64
 
 ```go
@@ -63,8 +64,8 @@ func main() {
 
 - `Format`和`Parse`
 
-前者对Time类型直接格式化；
-后者对string类型，先转为Time类型再格式化；
+前者对Time类型转化为string；
+后者对string类型，转换为Time类型；
 
 ```go
 func f2() {
@@ -241,14 +242,13 @@ Reset 会先调用 stopTimer 再调用 startTimer，类似于废弃之前的定�
 和 After 差不多，意思是每隔多少时间后，其他与 After 一致
 
 ```go
-fmt.Println("the 1")
-tc:=time.Tick(time.Second) //返回一个time.C这个管道，1秒(time.Second)后会在此管道中放入一个时间点，
-                        //1秒后再放一个，一直反复，时间点记录的是放入管道那一刻的时间
-for i:=1;i<=2;i++{
-    <-tc
-    fmt.Println("hello")
+func main() {
+    c := time.Tick(1 * time.Second)
+    for now := range c {
+        fmt.Printf("%v %s\n", now, "abc")
+    }
 }
-//每隔1秒，打印一个hello
+//每隔1秒，打印当前时间和一个字符串
 ```
 
 ## time.Time的方法
@@ -289,37 +289,3 @@ func main() {
 }
 ```
 
-
-## 待研究代码
-
-```go
-package main
-import (
-    "fmt"
-    "time"
-)
-
-var week time.Duration
-func main() {
-    t := time.Now()
-    fmt.Println(t) // e.g. Wed Dec 21 09:52:14 +0100 RST 2011
-    fmt.Printf("%02d.%02d.%4d\n", t.Day(), t.Month(), t.Year())
-    // 21.12.2011
-
-    t = time.Now().UTC()
-    fmt.Println(t) // Wed Dec 21 08:52:14 +0000 UTC 2011
-    fmt.Println(time.Now()) // Wed Dec 21 09:52:14 +0100 RST 2011
-
-    // calculating times:
-    week = 60 * 60 * 24 * 7 * 1e9 // must be in nanosec
-    week_from_now := t.Add(week)
-    fmt.Println(week_from_now) // Wed Dec 28 08:52:14 +0000 UTC 2011
-    // formatting times:
-    fmt.Println(t.Format(time.RFC822)) // 21 Dec 11 0852 UTC
-    fmt.Println(t.Format(time.ANSIC)) // Wed Dec 21 08:56:34 2011
-    fmt.Println(t.Format("02 Jan 2006 15:04")) // 21 Dec 2011 08:52
-    s := t.Format("20060102")
-    fmt.Println(t, "=>", s)
-    // Wed Dec 21 08:52:14 +0000 UTC 2011 => 20111221
-}
-```
