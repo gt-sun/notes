@@ -3,6 +3,8 @@
 
 https://github.com/dead-horse/node-style-guide/blob/master/Readme.md
 
+[Node.js 的代码风格和规范指南](https://github.com/jawil/Node.js/issues/1)
+
 # NodeJS 编码规范
 
 * 缩进，2 个 space，tab要转换成 `2 space`. (入乡随俗，这是Node 源码及module 采用的标准)

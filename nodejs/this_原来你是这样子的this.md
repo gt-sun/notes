@@ -105,60 +105,99 @@ bar （引用箭头函数）的 this 也会绑定到 obj1 ，箭头函数的绑�
 它们的第一个参数是一个对象，它们会把这个对象绑定到this ，接着在调用函数时指定这个 this 。因为你可以直接指定 this 的绑定对象，因此我们称之为显式绑定。
 
 ```js
-function foo(){
-    console.log(this.a)
+var foo = {
+    value: 1
+};
+
+function bar() {
+    console.log(this.value);
 }
 
-var obj = {
-    a:2,
-}
-
-foo.call(obj) //2
+bar.call(foo); // 1
 ```
 
-通过 `foo.call(..)` ，我们可以在调用 foo 时强制把它的 this 绑定到 obj 上。apply()方法效果一样，只是多了传参数的功能，见下：
+注意两点：
+
+1. call 改变了 this 的指向，指向到 foo
+2. bar 函数执行了
+
 
 ```js
-function foo(something) {
-    console.log(this.a, something)
-    return this.a + something
-}
-
+//带参数
 var obj = {
-    a: 2,
+    value:22
 }
 
-var baz = function () {
-    return foo.apply(obj, arguments)
+function foo(name,age){
+    console.log(name)
+    console.log(age)
+    console.log(this.value)
 }
 
-var s = baz(3) //2 3
-console.log(s) //5
+foo.call(obj,'Tim',28)
 ```
 
-> 如果你传入了一个原始值（字符串类型、布尔类型或者数字类型）来当作 this 的绑定对
-象，这个原始值会被转换成它的对象形式（也就是 new String(..) 、 new Boolean(..) 或者
-new Number(..) ）。这通常被称为“装箱”。
 
-
-由于硬绑定是一种非常常用的模式，所以在 ES5 中提供了内置的方法 `Function.prototype.bind` ，它的用法如下：
+通过 `foo.call(..)` ，我们可以在调用 foo 时强制把它的 this 绑定到 obj 上。apply()方法效果一样，只是传参为Arrar-like，见下：
 
 ```js
-function foo(something) {
-    console.log(this.a, something)
-    return this.a + something
-}
-
 var obj = {
-    a: 2,
+    value:22
 }
 
-var bar = foo.bind(obj)
 
-var s = bar(3) //2 3
-console.log(s) //5
+var arr = ['Tim',28]
+
+function foo(name,age){
+    console.log(name)
+    console.log(age)
+    console.log(this.value)
+}
+
+// foo.call(obj,arr)
+foo.apply(obj,arr)
+```
+
+
+由于硬绑定是一种非常常用的模式，所以在 ES5 中提供了内置的方法 `Function.prototype.bind` ，一句话介绍 bind:
+
+> bind() 方法会创建一个新函数。当这个新函数被调用时，bind() 的第一个参数将作为它运行时的 this, 之后的一序列参数将会在传递的实参前传入作为它的参数。(来自于 MDN)
+
+
+它的用法如下：
+
+```js
+var obj = {
+    value:22
+}
+
+function foo(name,age){
+    console.log(name)
+    console.log(age)
+    console.log(this.value)
+}
+
+var bar = foo.bind(obj,'Tim',28)
+bar()
 ```
 
 bind(..) 会返回一个硬编码的新函数，它会把参数设置为 this 的上下文并调用原始函数。
+
+还可以在执行返回的函数的时候，再传另一个参数，如下：
+
+```js
+var obj = {
+    value:22
+}
+
+function foo(name,age){
+    console.log(name)
+    console.log(age)
+    console.log(this.value)
+}
+
+var bar = foo.bind(obj,'Tim')
+bar(28)
+```
 
 

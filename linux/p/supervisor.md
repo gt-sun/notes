@@ -1,7 +1,9 @@
 [TOC]
 
 
+## 插件
 
+- [superlance](http://blog.csdn.net/baidu_zhongce/article/details/49151385)
 
 
 
@@ -32,10 +34,11 @@ command=/path/to/pidproxy /path/to/pidfile /path/to/mysqld_safe
 command=/path/to/tomcat/bin/catalina.sh run
 process_name=%(program_name)s
 startsecs=5
-stopsignal=INT
 user=tomcat
 redirect_stderr=true
 stdout_logfile=/var/log/tomcat.log  #catalina.out
+stopasgroup=true
+killasgroup=true
 ```
 
 
@@ -130,3 +133,34 @@ update    根据最新的配置文件，启动新配置或有改动的进程，�
 - 重新加载配置
 
 `supervisorctl -c /etc/supervisord.conf`
+
+
+
+## 配置 systemctl 服务
+
+1> 进入 /lib/systemd/system 目录，并创建 `supervisor.service` 文件
+
+```
+[Unit]
+Description=supervisor
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/usr/bin/supervisord -c /etc/supervisor/supervisord.conf
+ExecStop=/usr/bin/supervisorctl $OPTIONS shutdown
+ExecReload=/usr/bin/supervisorctl $OPTIONS reload
+KillMode=process
+Restart=on-failure
+RestartSec=42s
+
+[Install]
+WantedBy=multi-user.target
+```
+
+2> 设置开机启动
+
+```bash
+systemctl enable supervisor.service
+systemctl daemon-reload
+```
