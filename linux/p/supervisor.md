@@ -1,6 +1,11 @@
 [TOC]
 
 
+
+## 参考
+
+- [使用exec命令](http://www.cnblogs.com/yjf512/p/6492746.html)
+
 ## 插件
 
 - [superlance](http://blog.csdn.net/baidu_zhongce/article/details/49151385)

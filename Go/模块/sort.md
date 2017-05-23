@@ -1,6 +1,36 @@
 sort 包中实现了３种基本的排序算法：插入排序．快排和堆排序．和其他语言中一样，sort 包会根据实际数据自动选择高效的排序算法。
 
 
+## Go 1.8 新的 slice 排序 API
+
+统一的 slice 排序由新的 `sort.Slice` 函数实现。它允许任意的 slice 都可以被排序，只需提供一个回调比较函数即可，而不是像以前要提供一个特定的`sort.Interface`的实现。这个函数没有返回值。想其它的排序函数一样，它提供了原地的排序。
+
+下面的例子根据海拔高度排序知名山峰的 slice。
+
+```go
+type Peak struct {
+    Name      string
+    Elevation int // in feet
+}
+peaks := []Peak{
+    {"Aconcagua", 22838},
+    {"Denali", 20322},
+    {"Kilimanjaro", 19341},
+    {"Mount Elbrus", 18510},
+    {"Mount Everest", 29029},
+    {"Mount Kosciuszko", 7310},
+    {"Mount Vinson", 16050},
+    {"Puncak Jaya", 16024},
+}
+// does an in-place sort on the peaks slice, with tallest peak first
+sort.Slice(peaks, func(i, j int) bool {
+    return peaks[i].Elevation >= peaks[j].Elevation
+})
+// peaks is now sorted
+```
+
+通过`sort.Interface`类型的`Len()`和`Swap(i, j int)`提供了抽象的排序类型，这是以前的排序方法，而`Less(i, j int)`作为一个比较回调函数，可以简单地传递给`sort.Slice`进行排序。
+
 ## 自定义排序
 
 按照字符串的长度排序
