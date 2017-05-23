@@ -9,6 +9,9 @@
 ## 库
 
 
+- 错误处理 https://github.com/pkg/errors
+
+
 - govendor  —— Go 包管理工具
 
 https://github.com/kardianos/govendor
