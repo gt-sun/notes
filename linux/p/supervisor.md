@@ -58,6 +58,9 @@ killasgroup=true
 - 生成配置文件：` echo_supervisord_conf > /etc/supervisord.conf `
 
 
+python 2.6的环境可能需要升级依赖包，`pip install 'meld3 == 1.0.1'`
+
+
 - 修改配置：
 
 　　如需允许 web 界面和命令行访问
