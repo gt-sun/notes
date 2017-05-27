@@ -8,6 +8,8 @@
 
 ## 库
 
+- json parser https://github.com/tidwall/gjson
+
 
 - 错误处理 https://github.com/pkg/errors
 
