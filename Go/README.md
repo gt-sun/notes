@@ -6,7 +6,12 @@
 
 - [Golang 优化之路——临时对象池](http://blog.cyeam.com/golang/2017/02/08/go-optimize-slice-pool)
 
-## 库
+
+
+
+## 生产力库
+
+- [fsql](https://github.com/kshvmdn/fsql) —— Search through your filesystem with SQL-esque queries. 
 
 - json parser https://github.com/tidwall/gjson
 
