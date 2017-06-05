@@ -1,0 +1,29 @@
+
+
+- hosts: app_servers
+  vars:
+       app_path: "{{ base_path }}/22"
+
+
+---
+- hosts: '{{ hosts }}'
+  vars:
+    max_clients: 200
+  remote_user: root
+  tasks:
+  - name: ping
+    ping
+  - name: mvn
+    command: mvn clean package -P{{ PROD_BUILD }} -Dmaven.test.skip=true
+  - name: ls
+    command: ls -al target/$CI_PROJECT_NAME.$PACKAGE_TYPE && md5sum target/$CI_PROJECT_NAME.$PACKAGE_TYPE
+
+---
+
+- hosts: '{{ hosts }}'
+  remote_user: '{{ user }}'
+
+  tasks:
+     - ...
+
+ansible-playbook release.yml --extra-vars "hosts=app1 PROD_BUILD=prod"

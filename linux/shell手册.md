@@ -400,6 +400,9 @@ a='ee';b='a';echo ${!b} # 间接引用 name 变量的值
 将所有的 .mp3文件移入给定的目录：
 $ find path -type f -name "*.mp3" -exec mv {} target_dir \;
 
+查找10天前
+find /tmp/* -type f -mtime +10 -exec ls -l {} \;
+
 将所有文件名中的空格替换为字符“ _ ”：
 $ find path -type f -exec rename 's/ /_/g' {} \;
 ```
