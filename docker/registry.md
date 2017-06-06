@@ -1,6 +1,11 @@
 
 
 
+- api
+
+https://docs.docker.com/registry/spec/api/#overview
+
+
 - 配置文件
 
 [example file](https://github.com/docker/distribution/blob/master/cmd/registry/config-example.yml)

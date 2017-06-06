@@ -209,3 +209,54 @@ func main() {
     fmt.Println(src)
 }
 ```
+
+### 解析json网页
+
+```go
+package main
+
+import (
+    "encoding/json"
+    "fmt"
+    "io/ioutil"
+    "log"
+    "net/http"
+)
+
+// var url = "http://192.168.200.4/api/v4/groups"
+
+var url = "http://192.168.200.4/api/v4/groups/38/projects"
+
+type Result struct {
+    Id   int
+    Name string
+}
+
+func main() {
+    client := &http.Client{}
+    req, _ := http.NewRequest("GET", url, nil)
+    req.Header.Set("PRIVATE-TOKEN", "fbA_ez5PVv3-C_WEtCJB")
+    res, err := client.Do(req)
+    if err != nil {
+        log.Fatal(err)
+    }
+    defer res.Body.Close()
+
+    body, err := ioutil.ReadAll(res.Body)
+    if err != nil {
+        log.Fatal(err)
+    }
+    var results []Result
+    err = json.Unmarshal(body, &results)
+    if err != nil {
+        log.Fatal(err)
+    }
+    fmt.Printf("%+v", results)
+    fmt.Println("=================")
+    for _, v := range results {
+        fmt.Println(v.Id, v.Name)
+    }
+
+    fmt.Printf("总共有：%d个项目\n", len(results))
+}
+```
