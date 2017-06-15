@@ -1159,6 +1159,12 @@ ssh -p10022 -t hero@114.55.39.156 sudo /sun/shell/de.sh
 
 见`nginx/配置说明2.md`
 
+*查看*
+
+```
+openssl x509 -in /var/lib/docker/swarm/certificates/swarm-node.crt -text
+```
+
 ### sshpass
 
 安装
