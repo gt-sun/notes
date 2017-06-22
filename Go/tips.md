@@ -15,6 +15,18 @@ http://mikespook.com/2014/07/%E5%8D%81%E6%9D%A1%E6%9C%89%E7%94%A8%E7%9A%84-go-%E
 
 
 
+## bytes.NewReader / bufio.NewReader
+
+*When should I use bytes.NewReader instead of bufio.NewReader?*
+
+>These do two fundamentally different things; bytes.NewReader creates a 
+Reader from a byte slice (that is, a chunk of memory you already have 
+in your program.) Useful if you want to pass a byte slice to some 
+other API that expects a Reader. bufio.NewReader on the other hand is 
+for wrapping existing Readers (usually ones whose Read method is 
+relatively expensive, like a TCP connection or a file) to coalesce a 
+bunch of easy-to-program small Read calls into a few larger ones.
+
 ## import 的 _
 
 这个操作经常是让很多人费解的一个操作符，请看下面这个import
