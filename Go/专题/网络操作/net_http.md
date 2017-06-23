@@ -37,6 +37,26 @@ func httpRequestHandler(w http.ResponseWriter, req *http.Request) {
 
 ## 实例
 
+### 使用http.NewServerMux()
+
+```go
+func server() {
+    mux := http.NewServeMux()
+    mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, h *http.Request) {
+        fmt.Println("server: received request")
+        time.Sleep(time.Second)
+        io.WriteString(w, "Finished\n")
+        fmt.Println("server: request finished~")
+    }))
+
+    srv := &http.Server{Addr: ":8000", Handler: mux}
+
+    if err := srv.ListenAndServe(); err != nil {
+        fmt.Printf("Listen on :%s\n", err)
+    }
+}
+```
+
 ### 实现静态文件服务器，类似python的`python -m SimpleHTTP`
 
 from: https://github.com/Unknwon/go-web-foundation/blob/master/lectures/lecture2/code/02_Go_HTTP/main_v2.go
