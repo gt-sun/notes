@@ -51,7 +51,7 @@ webapps\
 
 
 ```
-JAVA_HOME=/opt/jdk1.8.0_92/
+JAVA_HOME=/opt/jdk1.8.0_92
 PATH=$JAVA_HOME/bin:$PATH
 export JAVA_HOME PATH
 ```
