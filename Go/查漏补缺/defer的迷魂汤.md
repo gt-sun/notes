@@ -4,17 +4,19 @@
 
 ## Defer 函数调用参数的求值
 
-被defer的函数的参数会在defer声明时求值（而不是在函数实际执行时）。
+当 defer 被声明时，其参数就会被实时解析
 
 ```go
-func foo() {
-	i := 0
-	defer fmt.Println(i)
-	i += 1
-	return
+func a() {  
+i := 0  
+defer fmt.Println(i) //输出0，因为i此时就是0  
+i++  
+defer fmt.Println(i) //输出1，因为i此时就是1  
+return  
 }
-    //prints: result => 0 (not ok if you expected 1)
 ```
+
+**defer 执行顺序为先进后出**
 
 
 ## 看看几个例子
