@@ -202,22 +202,20 @@ for i := range c {
 func main() {
     c := make(chan int)
     go func() { //1
-        time.Sleep(1e8) //2
+        time.Sleep(1e8) //3
         fmt.Println(<-c) //4
     }()
     c <- 10 //2 阻塞，等待4
 }
-
-//两处2 都有可能先执行到，但不影响。
 
 -----
 
 //可能有输出，可能无输出。主函数没有阻塞后，会立即结束。
 func main() {
     c := make(chan int)
-    go func() { 
-        fmt.Println(<-c) //1
-        time.Sleep(1e9) //永远不会执行到。·
+    go func() { //1
+        fmt.Println(<-c) //3
+        time.Sleep(1e9) // 在 Goroutine里，不会影响main进程
     }()
     c <- 10 //2
 }
@@ -230,7 +228,7 @@ func main() {
         c <- 1
     }()
 
-    fmt.Println(<-c)
+    fmt.Println(<-c) //print 放在main里就会被执行
 }
 ```
 

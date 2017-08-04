@@ -17,6 +17,7 @@
 
 
 
+
 ### yaml瞄点的使用
 
 `&`用来建立锚点（defaults），`<<`表示合并到当前数据，`*`用来引用锚点。
@@ -52,7 +53,17 @@ test:
 [ 'Steve', 'Clark', 'Brian', 'Oren', 'Steve' ]
 ```
 
+### 还有这种操作
 
+- 跳过一个job
+
+加一个`.`就行
+
+```
+.key_name:
+  script:
+    - rake spec
+```
 
 ### before_script
 

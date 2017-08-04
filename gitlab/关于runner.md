@@ -10,8 +10,20 @@ toml里面可写的内容
 - [GitLab Runner Commands](https://docs.gitlab.com/runner/commands/README.html)
 - [关于 Runner 的 Executors](https://docs.gitlab.com/runner/executors/README.html)
 - [使用docker作为Executor](https://docs.gitlab.com/runner/executors/docker.html)
+- [using_docker_build](https://docs.gitlab.com/ce/ci/docker/using_docker_build.html)
 - [gitlab-ci-multi-runner](https://gitlab.com/gitlab-org/gitlab-ci-multi-runner/tree/master/docs)
 - [config.toml配置](https://docs.gitlab.com/runner/configuration/advanced-configuration.html)
+
+```
+[[runners]]
+  name = "local-kvm"
+  url = "http://192.168.200.4/ci"
+  token = "edcdb701e2c383ae6830b85c87da22"
+  executor = "shell"
+  environment = ["STR1=s_2.1", "STR2=依赖包", "STR3=except:", "HARBOR_PW=Harbor12345"]
+  pre_build_script = "egrep -q \"${STR1}|${STR2}\" .gitlab-ci.yml || { echo '.gitlab-ci.yml文件有更新，请下载最新文件';exit 1; }\n                        grep -q \"${STR3}\" .gitlab-ci.yml && { echo '.gitlab-ci.yml文件有更新，请下载最新文件';exit 1; }\n"
+  [runners.cache]
+```
 
 - GitLab and the Runners communicate through an API, so the only requirement is that the Runner's machine has Internet access.
 - Runners run your yaml.
