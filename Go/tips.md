@@ -97,7 +97,10 @@ b:=a 其实是复制了一份 a 给 b，所以修改 b 不影响 a。c=a[:] 是�
 
 2. 对于方法（如 struct 的方法），接收者为值类型时，可以直接用指针类型的变量调用方法，反过来同样也可以。
 
+**结构体方法使用值和指针的区别**
 
+- https://nathanleclaire.com/blog/2014/08/09/dont-get-bitten-by-pointer-vs-non-pointer-method-receivers-in-golang/
+- https://golang.org/doc/faq#methods_on_values_or_pointers
 
 ## new 和 make
 
