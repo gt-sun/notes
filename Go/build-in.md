@@ -1,6 +1,30 @@
 
 
 
+## 1.9 type-alias
+
+`type T1 = T2`
+
+它们是完全相同的，只是拼写上的差异。下面这些都是一样的：
+
+- `*T1` and `*T2`
+- `chan T1` and `chan T2`
+- `func(T1)` and `func(T2)`
+- `interface{M() T1 }` and `interface{ M() T2 }`
+
+Since T1 is just another way to write T2, it does not have its own set of method declarations.
+
+The language specification already defines `byte` as an alias for `uint8` and similarly `rune` as an alias for `int32`, 
+
+而类型声明：`type Tnamed Tunderlying`.
+
+That declaration defines a new type Tnamed, different from (not identical to) Tunderlying. Because Tnamed is different from all other types, notably Tunderlying, composite types built from Tnamed and Tunderlying are different. For example, these pairs are all different types:
+
+- `*Tnamed` and `*Tunderlying`
+- `chan Tnamed` and `chan Tunderlying`
+- `func(Tnamed)` and `func(Tunderlying)`
+- `interface{M() Tnamed }` and `interface{ M() Tunderlying }`
+
 ## append
 
 - 将元素添加到切片
