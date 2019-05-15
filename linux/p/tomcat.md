@@ -8,6 +8,37 @@
 https://wiki.apache.org/tomcat/FAQ/Troubleshooting_and_Diagnostics
 
 
+## 使用 systemd 管理Tomcat 服务
+
+在`bin/catalina.sh`中添加：
+
+```
+# 设置pid。一定要加在CATALINA_BASE定义后面
+CATALINA_PID="$CATALINA_BASE/tomcat.pid"
+```
+
+添加`tomcat.service`文件：
+
+```
+# /etc/systemd/system/tomcat.service
+[Unit]
+Description=Apache Tomcat 8
+After=syslog.target network.target
+
+[Service]
+Type=forking
+PIDFile=/root/tomcat/tomcat.pid
+ExecStart=/root/tomcat/bin/startup.sh
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s QUIT $MAINPID
+PrivateTmp=true
+User=root
+Group=root
+
+[Install]
+WantedBy=multi-user.target
+```
+
 ## tomcat 注意事项
 
 - war包不能在tomcat运行时删除，否则会删除自动解压的工程。你可以停止tomcat后删除war包。
